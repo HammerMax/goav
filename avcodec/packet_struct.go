@@ -6,6 +6,10 @@ package avcodec
 //#cgo pkg-config: libavcodec
 //#include <libavcodec/avcodec.h>
 import "C"
+import (
+	"reflect"
+	"unsafe"
+)
 
 func (p *Packet) Buf() *AvBufferRef {
 	return (*AvBufferRef)(p.buf)
@@ -46,9 +50,21 @@ func (p *Packet) Pos() int64 {
 func (p *Packet) Pts() int64 {
 	return int64(p.pts)
 }
+
 func (p *Packet) SetPts(pts int64) {
 	p.dts = C.int64_t(pts)
 }
+
 func (p *Packet) Data() *uint8 {
 	return (*uint8)(p.data)
+}
+
+// DataSlice 使用 data 和 size 属性，返回[]byte
+func (p *Packet) DataSlice() []byte {
+	header := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(p.data)),
+		Len:  p.Size(),
+		Cap:  p.Size(),
+	}
+	return *(*[]byte)(unsafe.Pointer(&header))
 }

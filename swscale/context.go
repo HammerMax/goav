@@ -26,7 +26,8 @@ func SwsFreecontext(ctxt *Context) {
 }
 
 //Allocate and return an Context.
-func SwsGetcontext(sw, sh int, sf PixelFormat, dw, dh int, df PixelFormat, f int, sfl, dfl *Filter, p *int) *Context {
+func SwsGetcontext(sw, sh int32, sf PixelFormat, dw, dh int32, df PixelFormat, f int, sfl, dfl *Filter,
+	p *int) *Context {
 	return (*Context)(C.sws_getContext(C.int(sw), C.int(sh), (C.enum_AVPixelFormat)(sf), C.int(dw), C.int(dh), (C.enum_AVPixelFormat)(df), C.int(f), (*C.struct_SwsFilter)(sfl), (*C.struct_SwsFilter)(dfl), (*C.double)(unsafe.Pointer(p))))
 }
 

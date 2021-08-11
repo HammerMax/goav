@@ -62,9 +62,8 @@ func (p *Packet) AvCopyPacketSideData(r *Packet) int {
 }
 
 //Free a packet.
-func (p *Packet) AvFreePacket() {
-	C.av_free_packet((*C.struct_AVPacket)(p))
-
+func (p *Packet) AvPacketFree() {
+	C.av_packet_free((**C.struct_AVPacket)(unsafe.Pointer(&p)))
 }
 
 //Allocate new information of a packet.
@@ -117,7 +116,7 @@ func (p *Packet) AvPacketCopyProps(s *Packet) int {
 	return int(C.av_packet_copy_props((*C.struct_AVPacket)(p), (*C.struct_AVPacket)(s)))
 }
 
-//Convert valid timing fields (timestamps / durations) in a packet from one timebase to another.
-func (p *Packet) AvPacketRescaleTs(r, r2 Rational) {
-	C.av_packet_rescale_ts((*C.struct_AVPacket)(p), (C.struct_AVRational)(r), (C.struct_AVRational)(r2))
-}
+////Convert valid timing fields (timestamps / durations) in a packet from one timebase to another.
+//func (p *Packet) AvPacketRescaleTs(r, r2 avutil.Rational) {
+//	C.av_packet_rescale_ts((*C.struct_AVPacket)(p), (C.struct_AVRational)(r), (C.struct_AVRational)(r2))
+//}

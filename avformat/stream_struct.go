@@ -17,8 +17,8 @@ func (avs *Stream) CodecParameters() *avcodec.AvCodecParameters {
 	return (*avcodec.AvCodecParameters)(unsafe.Pointer(avs.codecpar))
 }
 
-func (avs *Stream) Codec() *CodecContext {
-	return (*CodecContext)(unsafe.Pointer(avs.codec))
+func (avs *Stream) Codec() *avcodec.Context {
+	return (*avcodec.Context)(unsafe.Pointer(avs.codec))
 }
 
 func (avs *Stream) Metadata() *avutil.Dictionary {
@@ -37,21 +37,21 @@ func (avs *Stream) SideData() *AvPacketSideData {
 	return (*AvPacketSideData)(unsafe.Pointer(avs.side_data))
 }
 
-func (avs *Stream) AvgFrameRate() avcodec.Rational {
-	return newRational(avs.avg_frame_rate)
-}
-
-func (avs *Stream) RFrameRate() avcodec.Rational {
-	return newRational(avs.r_frame_rate)
-}
-
-func (avs *Stream) SampleAspectRatio() avcodec.Rational {
-	return newRational(avs.sample_aspect_ratio)
-}
-
-func (avs *Stream) TimeBase() avcodec.Rational {
-	return newRational(avs.time_base)
-}
+//func (avs *Stream) AvgFrameRate() avutil.Rational {
+//	return avutil.NewRational(avs.avg_frame_rate)
+//}
+//
+//func (avs *Stream) RFrameRate() avutil.Rational {
+//	return avutil.NewRational(avs.r_frame_rate)
+//}
+//
+//func (avs *Stream) SampleAspectRatio() avutil.Rational {
+//	return avutil.NewRational(avs.sample_aspect_ratio)
+//}
+//
+//func (avs *Stream) TimeBase() avutil.Rational {
+//	return avutil.NewRational(avs.time_base)
+//}
 
 // func (avs *Stream) RecommendedEncoderConfiguration() string {
 // 	return C.GoString(avs.recommended_encoder_configuration)

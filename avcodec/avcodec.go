@@ -31,7 +31,6 @@ type (
 	Packet                        C.struct_AVPacket
 	BitStreamFilter               C.struct_AVBitStreamFilter
 	BitStreamFilterContext        C.struct_AVBitStreamFilterContext
-	Rational                      C.struct_AVRational
 	Class                         C.struct_AVClass
 	AvCodecParameters             C.struct_AVCodecParameters
 	AvHWAccel                     C.struct_AVHWAccel
@@ -111,6 +110,10 @@ func (c *Codec) AvCodecIsEncoder() int {
 
 func (c *Codec) AvCodecIsDecoder() int {
 	return int(C.av_codec_is_decoder((*C.struct_AVCodec)(c)))
+}
+
+func (c *Codec) Id() CodecId {
+	return CodecId(c.id)
 }
 
 //Same behaviour av_fast_malloc but the buffer has additional FF_INPUT_BUFFER_PADDING_SIZE at the end which will always be 0.

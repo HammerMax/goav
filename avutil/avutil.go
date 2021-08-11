@@ -12,6 +12,7 @@ package avutil
 //#include <stdlib.h>
 import "C"
 import (
+	"fmt"
 	"unsafe"
 )
 
@@ -24,6 +25,34 @@ type (
 	PixelFormat   C.enum_AVPixelFormat
 	File          C.FILE
 )
+
+func (r Rational) Num() int {
+	return int(r.num)
+}
+
+func (r Rational) Den() int {
+	return int(r.den)
+}
+
+func (r Rational) String() string {
+	return fmt.Sprintln("%d/%d", int(r.num), int(r.den))
+}
+
+func (r *Rational) Assign(o Rational) {
+	r.Set(o.Num(), o.Den())
+}
+
+func (r *Rational) Set(num, den int) {
+	r.num, r.den = C.int(num), C.int(den)
+}
+
+func NewRational(num, den int) Rational {
+	return Rational{
+		num: C.int(num),
+		den: C.int(den),
+	}
+}
+
 
 //Return the LIBAvUTIL_VERSION_INT constant.
 func AvutilVersion() uint {

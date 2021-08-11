@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"reflect"
 	"unsafe"
 )
 
@@ -47,9 +48,69 @@ func AvFrameFree(f *Frame) {
 	C.av_frame_free((**C.struct_AVFrame)(unsafe.Pointer(&f)))
 }
 
-//Allocate new buffer(s) for audio or video data.
-func AvFrameGetBuffer(f *Frame, a int) int {
-	return int(C.av_frame_get_buffer((*C.struct_AVFrame)(unsafe.Pointer(f)), C.int(a)))
+func (f *Frame) SetFormat(format int32) {
+	f.format = C.int(format)
+}
+
+func (f *Frame) SetWidth(width int32) {
+	f.width = C.int(width)
+}
+
+func (f *Frame) SetHeight(height int32) {
+	f.height = C.int(height)
+}
+
+func (f *Frame) Pts() int64 {
+	return int64(f.pts)
+}
+
+func (f *Frame) SetPts(pktPts int) {
+	f.pts = C.int64_t(pktPts)
+}
+
+func (f *Frame) AvFrameGetBuffer(align int32) int32 {
+	return int32(C.av_frame_get_buffer((*C.struct_AVFrame)(unsafe.Pointer(f)), C.int(align)))
+}
+
+func (f *Frame) Data() [][]byte {
+	var data = make([][]byte, int(C.AV_NUM_DATA_POINTERS))
+	for i:=int32(0);i<int32(C.AV_NUM_DATA_POINTERS);i++ {
+		header := reflect.SliceHeader{
+			Data: uintptr(unsafe.Pointer(f.data[i])),
+			Len:  int(f.linesize[i]),
+			Cap:  int(f.linesize[i]),
+		}
+		data[i] = *(*[]byte)(unsafe.Pointer(&header))
+	}
+	return data
+}
+
+func (f *Frame) SetDataSimple(x, y int, data uint8) {
+	if x >= int(C.AV_NUM_DATA_POINTERS) {
+		panic("array out of bound")
+	}
+
+	header := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(f.data[x])),
+		Len:  100000000,
+		Cap:  100000000, // TODO frame data size 暂时无法获取，业务自己保证不会越界
+	}
+
+	a := *(*[]uint8)(unsafe.Pointer(&header))
+	a[y] = data
+}
+
+func (f *Frame) LineSize() []int32 {
+	header := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(&f.linesize)),
+		Len:  int(C.AV_NUM_DATA_POINTERS),
+		Cap:  int(C.AV_NUM_DATA_POINTERS),
+	}
+	return *(*[]int32)(unsafe.Pointer(&header))
+}
+
+func (f *Frame) AvFrameFree() {
+	C.av_frame_free((**C.struct_AVFrame)(unsafe.Pointer(&f)))
 }
 
 //Setup a new reference to the data described by an given frame.
@@ -73,14 +134,8 @@ func AvFrameMoveRef(d, s *Frame) {
 	C.av_frame_move_ref((*C.struct_AVFrame)(unsafe.Pointer(d)), (*C.struct_AVFrame)(unsafe.Pointer(s)))
 }
 
-//Check if the frame data is writable.
-func AvFrameIsWritable(f *Frame) int {
-	return int(C.av_frame_is_writable((*C.struct_AVFrame)(unsafe.Pointer(f))))
-}
-
-//Ensure that the frame data is writable, avoiding data copy if possible.
-func AvFrameMakeWritable(f *Frame) int {
-	return int(C.av_frame_make_writable((*C.struct_AVFrame)(unsafe.Pointer(f))))
+func (f *Frame) AvFrameMakeWritable() int32 {
+	return int32(C.av_frame_make_writable((*C.struct_AVFrame)(unsafe.Pointer(f))))
 }
 
 //Copy only "metadata" fields from src to dst.

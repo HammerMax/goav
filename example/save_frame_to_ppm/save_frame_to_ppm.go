@@ -33,7 +33,7 @@ import (
 )
 
 // SaveFrame writes a single frame to disk as a PPM file
-func SaveFrame(frame *avutil.Frame, width, height, frameNumber int) {
+func SaveFrame(frame *avutil.Frame, width, height int32, frameNumber int) {
 	// Open file
 	fileName := fmt.Sprintf("frame%d.ppm", frameNumber)
 	file, err := os.Create(fileName)
@@ -47,11 +47,11 @@ func SaveFrame(frame *avutil.Frame, width, height, frameNumber int) {
 	file.Write([]byte(header))
 
 	// Write pixel data
-	for y := 0; y < height; y++ {
+	for y := int32(0); y < height; y++ {
 		data0 := avutil.Data(frame)[0]
 		buf := make([]byte, width*3)
 		startPos := uintptr(unsafe.Pointer(data0)) + uintptr(y)*uintptr(avutil.Linesize(frame)[0])
-		for i := 0; i < width*3; i++ {
+		for i := int32(0); i < width*3; i++ {
 			element := *(*uint8)(unsafe.Pointer(startPos + uintptr(i)))
 			buf[i] = element
 		}
@@ -84,7 +84,7 @@ func main() {
 	// Find the first video stream
 	for i := 0; i < int(pFormatContext.NbStreams()); i++ {
 		switch pFormatContext.Streams()[i].CodecParameters().AvCodecGetType() {
-		case avformat.AVMEDIA_TYPE_VIDEO:
+		case avutil.AVMEDIA_TYPE_VIDEO:
 
 			// Get a pointer to the codec context for the video stream
 			pCodecCtxOrig := pFormatContext.Streams()[i].Codec()
@@ -135,7 +135,7 @@ func main() {
 				(swscale.PixelFormat)(pCodecCtx.PixFmt()),
 				pCodecCtx.Width(),
 				pCodecCtx.Height(),
-				avcodec.AV_PIX_FMT_RGB24,
+				swscale.PixelFormat(avcodec.AV_PIX_FMT_RGB24),
 				avcodec.SWS_BILINEAR,
 				nil,
 				nil,
@@ -154,7 +154,7 @@ func main() {
 						fmt.Printf("Error while sending a packet to the decoder: %s\n", avutil.ErrorFromCode(response))
 					}
 					for response >= 0 {
-						response = pCodecCtx.AvcodecReceiveFrame((*avcodec.Frame)(unsafe.Pointer(pFrame)))
+						response = int(pCodecCtx.AvcodecReceiveFrame((*avutil.Frame)(unsafe.Pointer(pFrame))))
 						if response == avutil.AvErrorEAGAIN || response == avutil.AvErrorEOF {
 							break
 						} else if response < 0 {

@@ -7,6 +7,7 @@ package avformat
 //#include <libavformat/avformat.h>
 import "C"
 import (
+	"github.com/giorgisio/goav/avcodec"
 	"reflect"
 	"unsafe"
 
@@ -17,16 +18,16 @@ func (ctxt *Context) Chapters() **AvChapter {
 	return (**AvChapter)(unsafe.Pointer(ctxt.chapters))
 }
 
-func (ctxt *Context) AudioCodec() *AvCodec {
-	return (*AvCodec)(unsafe.Pointer(ctxt.audio_codec))
+func (ctxt *Context) AudioCodec() *avcodec.Codec {
+	return (*avcodec.Codec)(unsafe.Pointer(ctxt.audio_codec))
 }
 
-func (ctxt *Context) SubtitleCodec() *AvCodec {
-	return (*AvCodec)(unsafe.Pointer(ctxt.subtitle_codec))
+func (ctxt *Context) SubtitleCodec() *avcodec.Codec {
+	return (*avcodec.Codec)(unsafe.Pointer(ctxt.subtitle_codec))
 }
 
-func (ctxt *Context) VideoCodec() *AvCodec {
-	return (*AvCodec)(unsafe.Pointer(ctxt.video_codec))
+func (ctxt *Context) VideoCodec() *avcodec.Codec {
+	return (*avcodec.Codec)(unsafe.Pointer(ctxt.video_codec))
 }
 
 func (ctxt *Context) Metadata() *avutil.Dictionary {
@@ -77,16 +78,16 @@ func (ctxt *Context) Filename() string {
 // 	return C.GoString(ctxt.format_whitelist)
 // }
 
-func (ctxt *Context) AudioCodecId() CodecId {
-	return CodecId(ctxt.audio_codec_id)
+func (ctxt *Context) AudioCodecId() avcodec.CodecId {
+	return avcodec.CodecId(ctxt.audio_codec_id)
 }
 
-func (ctxt *Context) SubtitleCodecId() CodecId {
-	return CodecId(ctxt.subtitle_codec_id)
+func (ctxt *Context) SubtitleCodecId() avcodec.CodecId {
+	return avcodec.CodecId(ctxt.subtitle_codec_id)
 }
 
-func (ctxt *Context) VideoCodecId() CodecId {
-	return CodecId(ctxt.video_codec_id)
+func (ctxt *Context) VideoCodecId() avcodec.CodecId {
+	return avcodec.CodecId(ctxt.video_codec_id)
 }
 
 func (ctxt *Context) DurationEstimationMethod() AvDurationEstimationMethod {

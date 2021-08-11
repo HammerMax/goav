@@ -25,28 +25,28 @@ func (s *Context) AvFormatGetProbeScore() int {
 	return int(C.av_format_get_probe_score((*C.struct_AVFormatContext)(s)))
 }
 
-func (s *Context) AvFormatGetVideoCodec() *AvCodec {
-	return (*AvCodec)(C.av_format_get_video_codec((*C.struct_AVFormatContext)(s)))
+func (s *Context) AvFormatGetVideoCodec() *avcodec.Codec {
+	return CToCodec(C.av_format_get_video_codec((*C.struct_AVFormatContext)(s)))
 }
 
-func (s *Context) AvFormatSetVideoCodec(c *AvCodec) {
-	C.av_format_set_video_codec((*C.struct_AVFormatContext)(s), (*C.struct_AVCodec)(c))
+func (s *Context) AvFormatSetVideoCodec(c *avcodec.Codec) {
+	C.av_format_set_video_codec((*C.struct_AVFormatContext)(s), CodecToC(c))
 }
 
-func (s *Context) AvFormatGetAudioCodec() *AvCodec {
-	return (*AvCodec)(C.av_format_get_audio_codec((*C.struct_AVFormatContext)(s)))
+func (s *Context) AvFormatGetAudioCodec() *avcodec.Codec {
+	return CToCodec(C.av_format_get_audio_codec((*C.struct_AVFormatContext)(s)))
 }
 
-func (s *Context) AvFormatSetAudioCodec(c *AvCodec) {
-	C.av_format_set_audio_codec((*C.struct_AVFormatContext)(s), (*C.struct_AVCodec)(c))
+func (s *Context) AvFormatSetAudioCodec(c *avcodec.Codec) {
+	C.av_format_set_audio_codec((*C.struct_AVFormatContext)(s), CodecToC(c))
 }
 
-func (s *Context) AvFormatGetSubtitleCodec() *AvCodec {
-	return (*AvCodec)(C.av_format_get_subtitle_codec((*C.struct_AVFormatContext)(s)))
+func (s *Context) AvFormatGetSubtitleCodec() *avcodec.Codec {
+	return CToCodec(C.av_format_get_subtitle_codec((*C.struct_AVFormatContext)(s)))
 }
 
-func (s *Context) AvFormatSetSubtitleCodec(c *AvCodec) {
-	C.av_format_set_subtitle_codec((*C.struct_AVFormatContext)(s), (*C.struct_AVCodec)(c))
+func (s *Context) AvFormatSetSubtitleCodec(c *avcodec.Codec) {
+	C.av_format_set_subtitle_codec((*C.struct_AVFormatContext)(s), CodecToC(c))
 }
 
 func (s *Context) AvFormatGetMetadataHeaderPadding() int {
@@ -81,8 +81,8 @@ func (s *Context) AvformatFreeContext() {
 }
 
 //Add a new stream to a media file.
-func (s *Context) AvformatNewStream(c *AvCodec) *Stream {
-	return (*Stream)(C.avformat_new_stream((*C.struct_AVFormatContext)(s), (*C.struct_AVCodec)(c)))
+func (s *Context) AvformatNewStream(c *avcodec.Codec) *Stream {
+	return (*Stream)(C.avformat_new_stream((*C.struct_AVFormatContext)(s), CodecToC(c)))
 }
 
 func (s *Context) AvNewProgram(id int) *AvProgram {
@@ -100,7 +100,7 @@ func (s *Context) AvFindProgramFromStream(l *AvProgram, su int) *AvProgram {
 }
 
 //Find the "best" stream in the file.
-func AvFindBestStream(ic *Context, t MediaType, ws, rs int, c **AvCodec, f int) int {
+func AvFindBestStream(ic *Context, t avutil.MediaType, ws, rs int, c **avcodec.Codec, f int) int {
 	return int(C.av_find_best_stream((*C.struct_AVFormatContext)(ic), (C.enum_AVMediaType)(t), C.int(ws), C.int(rs), (**C.struct_AVCodec)(unsafe.Pointer(c)), C.int(f)))
 }
 
@@ -116,9 +116,8 @@ func (s *Context) AvSeekFrame(st int, t int64, f int) int {
 
 // AvSeekFrameTime seeks to a specified time location.
 // |timebase| is codec specific and can be obtained by calling AvCodecGetPktTimebase2
-func (s *Context) AvSeekFrameTime(st int, at time.Duration, timebase avcodec.Rational) int {
+func (s *Context) AvSeekFrameTime(st int, at time.Duration, timebase avutil.Rational) int {
 	t2 := C.double(C.double(at.Seconds())*C.double(timebase.Den())) / (C.double(timebase.Num()))
-	// log.Printf("Seeking to time :%v TimebaseTime:%v ActualTimebase:%v", at, t2, timebase)
 	return int(C.av_seek_frame((*C.struct_AVFormatContext)(s), C.int(st), C.int64_t(t2), AvseekFlagBackward))
 }
 
@@ -194,15 +193,17 @@ func (s *Context) AvDumpFormat(i int, url string, io int) {
 	C.av_dump_format((*C.struct_AVFormatContext)(unsafe.Pointer(s)), C.int(i), Curl, C.int(io))
 }
 
-//Guess the sample aspect ratio of a frame, based on both the stream and the frame aspect ratio.
-func (s *Context) AvGuessSampleAspectRatio(st *Stream, fr *Frame) avcodec.Rational {
-	return newRational(C.av_guess_sample_aspect_ratio((*C.struct_AVFormatContext)(s), (*C.struct_AVStream)(st), (*C.struct_AVFrame)(fr)))
-}
+////Guess the sample aspect ratio of a frame, based on both the stream and the frame aspect ratio.
+//func (s *Context) AvGuessSampleAspectRatio(st *Stream, fr *Frame) avutil.Rational {
+//	return avutil.NewRational(C.av_guess_sample_aspect_ratio((*C.struct_AVFormatContext)(s), (*C.struct_AVStream)(st),
+//		(*C.struct_AVFrame)(fr)))
+//}
 
-//Guess the frame rate, based on both the container and codec information.
-func (s *Context) AvGuessFrameRate(st *Stream, fr *Frame) avcodec.Rational {
-	return newRational(C.av_guess_frame_rate((*C.struct_AVFormatContext)(s), (*C.struct_AVStream)(st), (*C.struct_AVFrame)(fr)))
-}
+////Guess the frame rate, based on both the container and codec information.
+//func (s *Context) AvGuessFrameRate(st *Stream, fr *Frame) avutil.Rational {
+//	return avutil.NewRational(C.av_guess_frame_rate((*C.struct_AVFormatContext)(s), (*C.struct_AVStream)(st),
+//		(*C.struct_AVFrame)(fr)))
+//}
 
 //Check if the stream st contained in s is matched by the stream specifier spec.
 func (s *Context) AvformatMatchStreamSpecifier(st *Stream, spec string) int {
@@ -216,15 +217,15 @@ func (s *Context) AvformatQueueAttachedPictures() int {
 	return int(C.avformat_queue_attached_pictures((*C.struct_AVFormatContext)(s)))
 }
 
-func (s *Context) AvformatNewStream2(c *AvCodec) *Stream {
-	stream := (*Stream)(C.avformat_new_stream((*C.struct_AVFormatContext)(s), (*C.struct_AVCodec)(c)))
-	stream.codec.pix_fmt = int32(avcodec.AV_PIX_FMT_YUV)
-	stream.codec.width = 640
-	stream.codec.height = 480
-	stream.time_base.num = 1
-	stream.time_base.num = 25
-	return stream
-}
+//func (s *Context) AvformatNewStream2(c *avcodec.Codec) *Stream {
+//	stream := (*Stream)(C.avformat_new_stream((*C.struct_AVFormatContext)(s), (*C.struct_AVCodec)(c)))
+//	stream.codec.pix_fmt = int32(avcodec.AV_PIX_FMT_YUV)
+//	stream.codec.width = 640
+//	stream.codec.height = 480
+//	stream.time_base.num = 1
+//	stream.time_base.num = 25
+//	return stream
+//}
 
 // //av_format_control_message av_format_get_control_message_cb (const Context *s)
 // func (s *Context) AvFormatControlMessage() C.av_format_get_control_message_cb {

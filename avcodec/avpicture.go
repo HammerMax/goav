@@ -10,7 +10,7 @@ import (
 )
 
 // AvpictureFill - Setup the picture fields based on the specified image parameters and the provided image data buffer.
-func (p *Picture) AvpictureFill(pt *uint8, pf PixelFormat, w, h int) int {
+func (p *Picture) AvpictureFill(pt *uint8, pf PixelFormat, w, h int32) int {
 	return int(C.avpicture_fill((*C.struct_AVPicture)(p), (*C.uint8_t)(pt), (C.enum_AVPixelFormat)(pf), C.int(w), C.int(h)))
 }
 
@@ -45,6 +45,6 @@ func (p *Picture) AvpictureFree() {
 }
 
 // AvpictureGetSize - Calculate the size in bytes that a picture of the given width and height would occupy if stored in the given picture format.
-func AvpictureGetSize(pf PixelFormat, w, h int) int {
+func AvpictureGetSize(pf PixelFormat, w, h int32) int {
 	return int(C.avpicture_get_size((C.enum_AVPixelFormat)(pf), C.int(w), C.int(h)))
 }
