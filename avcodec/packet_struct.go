@@ -26,9 +26,15 @@ func (p *Packet) SetFlags(flags int) {
 func (p *Packet) SideDataElems() int {
 	return int(p.side_data_elems)
 }
+
 func (p *Packet) Size() int {
 	return int(p.size)
 }
+
+func (p *Packet) SizePoint() *int {
+	return (*int)(unsafe.Pointer(&p.size))
+}
+
 func (p *Packet) StreamIndex() int {
 	return int(p.stream_index)
 }
@@ -57,6 +63,10 @@ func (p *Packet) SetPts(pts int64) {
 
 func (p *Packet) Data() *uint8 {
 	return (*uint8)(p.data)
+}
+
+func (p *Packet) DataPoint() **uint8 {
+	return (**uint8)(unsafe.Pointer(&p.data))
 }
 
 // DataSlice 使用 data 和 size 属性，返回[]byte

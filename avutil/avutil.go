@@ -16,6 +16,10 @@ import (
 	"unsafe"
 )
 
+const (
+	AV_NOPTS_VALUE = C.AV_NOPTS_VALUE
+)
+
 type (
 	Options       C.struct_AVOptions
 	AvTree        C.struct_AVTree

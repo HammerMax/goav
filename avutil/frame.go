@@ -52,12 +52,20 @@ func (f *Frame) SetFormat(format int32) {
 	f.format = C.int(format)
 }
 
+func (f *Frame) Width() int32 {
+	return (int32)(f.width)
+}
+
 func (f *Frame) SetWidth(width int32) {
 	f.width = C.int(width)
 }
 
 func (f *Frame) SetHeight(height int32) {
 	f.height = C.int(height)
+}
+
+func (f *Frame) Height() int32 {
+	return (int32)(f.height)
 }
 
 func (f *Frame) Pts() int64 {
@@ -77,8 +85,8 @@ func (f *Frame) Data() [][]byte {
 	for i:=int32(0);i<int32(C.AV_NUM_DATA_POINTERS);i++ {
 		header := reflect.SliceHeader{
 			Data: uintptr(unsafe.Pointer(f.data[i])),
-			Len:  int(f.linesize[i]),
-			Cap:  int(f.linesize[i]),
+			Len:  100000000,
+			Cap:  100000000,
 		}
 		data[i] = *(*[]byte)(unsafe.Pointer(&header))
 	}

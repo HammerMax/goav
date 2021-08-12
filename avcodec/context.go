@@ -9,6 +9,7 @@ package avcodec
 import "C"
 import (
 	"github.com/giorgisio/goav/avutil"
+	"reflect"
 	"unsafe"
 )
 
@@ -140,20 +141,22 @@ func (c *Context) AvcodecIsOpen() int {
 }
 
 //Parse a packet.
-func (c *Context) AvParserParse2(ctxtp *ParserContext, p **uint8, ps *int, b *uint8, bs int, pt, dt, po int64) int {
-	return int(C.av_parser_parse2((*C.struct_AVCodecParserContext)(ctxtp), (*C.struct_AVCodecContext)(c), (**C.uint8_t)(unsafe.Pointer(p)), (*C.int)(unsafe.Pointer(ps)), (*C.uint8_t)(b), C.int(bs), (C.int64_t)(pt), (C.int64_t)(dt), (C.int64_t)(po)))
+func (p *ParserContext) AvParserParse2(c *Context, packetData **uint8, packetSize *int, data []byte, dataSize int, pt, dt, po int64) int {
+	sliceHeader := *(*reflect.SliceHeader)(unsafe.Pointer(&data))
+	sliceHeaderPoint := sliceHeader.Data
+	return int(C.av_parser_parse2((*C.struct_AVCodecParserContext)(p), (*C.struct_AVCodecContext)(unsafe.Pointer(c)), (**C.uint8_t)(unsafe.Pointer(packetData)), (*C.int)(unsafe.Pointer(packetSize)), (*C.uint8_t)(unsafe.Pointer(sliceHeaderPoint)), C.int(dataSize), (C.int64_t)(pt), (C.int64_t)(dt), (C.int64_t)(po)))
 }
 
 func (c *Context) AvParserChange(ctxtp *ParserContext, pb **uint8, pbs *int, b *uint8, bs, k int) int {
 	return int(C.av_parser_change((*C.struct_AVCodecParserContext)(ctxtp), (*C.struct_AVCodecContext)(c), (**C.uint8_t)(unsafe.Pointer(pb)), (*C.int)(unsafe.Pointer(pbs)), (*C.uint8_t)(b), C.int(bs), C.int(k)))
 }
 
-func AvParserInit(c int) *ParserContext {
+func AvParserInit(c CodecId) *ParserContext {
 	return (*ParserContext)(C.av_parser_init(C.int(c)))
 }
 
-func AvParserClose(ctxtp *ParserContext) {
-	C.av_parser_close((*C.struct_AVCodecParserContext)(ctxtp))
+func (c *ParserContext) AvParserClose() {
+	C.av_parser_close((*C.struct_AVCodecParserContext)(c))
 }
 
 func (p *Parser) AvParserNext() *Parser {

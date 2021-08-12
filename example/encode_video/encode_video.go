@@ -114,7 +114,7 @@ func main() {
 		for y := int32(0); y < codecCtx.Height()/2; y++ {
 			for x :=int32(0); x < codecCtx.Width()/2; x++ {
 				frame.SetDataSimple(1, int(y * frame.LineSize()[1] + x), uint8(128 + y + int32(i * 2)))
-				frame.SetDataSimple(2, int(y * frame.LineSize()[2] + x), uint8(64 + y + int32(i * 5)))
+				frame.SetDataSimple(2, int(y * frame.LineSize()[2] + x), uint8(64 + x + int32(i * 5)))
 			}
 		}
 
