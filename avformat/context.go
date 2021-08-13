@@ -82,7 +82,7 @@ func (s *Context) AvformatFreeContext() {
 
 //Add a new stream to a media file.
 func (s *Context) AvformatNewStream(c *avcodec.Codec) *Stream {
-	return (*Stream)(C.avformat_new_stream((*C.struct_AVFormatContext)(s), CodecToC(c)))
+	return (*Stream)(C.avformat_new_stream((*C.struct_AVFormatContext)(s), (*C.struct_AVCodec)(unsafe.Pointer(c))))
 }
 
 func (s *Context) AvNewProgram(id int) *AvProgram {
@@ -142,8 +142,8 @@ func (s *Context) AvformatCloseInput() {
 }
 
 //Allocate the stream private data and write the stream header to an output media file.
-func (s *Context) AvformatWriteHeader(o **avutil.Dictionary) int {
-	return int(C.avformat_write_header((*C.struct_AVFormatContext)(s), (**C.struct_AVDictionary)(unsafe.Pointer(o))))
+func (s *Context) AvformatWriteHeader(o **avutil.Dictionary) error {
+	return avutil.ErrorFromCode(int(C.avformat_write_header((*C.struct_AVFormatContext)(s), (**C.struct_AVDictionary)(unsafe.Pointer(o)))))
 }
 
 //Write a packet to an output media file.

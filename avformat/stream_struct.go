@@ -25,6 +25,10 @@ func (avs *Stream) Metadata() *avutil.Dictionary {
 	return (*avutil.Dictionary)(unsafe.Pointer(avs.metadata))
 }
 
+func (avs *Stream) TimeBase() avutil.Rational {
+	return *(*avutil.Rational)(unsafe.Pointer(&avs.time_base))
+}
+
 func (avs *Stream) IndexEntries() *AvIndexEntry {
 	return (*AvIndexEntry)(unsafe.Pointer(avs.index_entries))
 }

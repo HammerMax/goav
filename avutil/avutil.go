@@ -27,7 +27,17 @@ type (
 	MediaType     C.enum_AVMediaType
 	AvPictureType C.enum_AVPictureType
 	PixelFormat   C.enum_AVPixelFormat
+	AVRounding    C.enum_AVRounding
 	File          C.FILE
+)
+
+const (
+	AV_ROUND_ZERO     = AVRounding(0)
+	AV_ROUND_INF      = AVRounding(1)
+	AV_ROUND_DOWN     = AVRounding(2)
+	AV_ROUND_UP       = AVRounding(3)
+	AV_ROUND_NEAR_INF = AVRounding(5)
+	AV_ROUND_PASS_MINMAX = AVRounding(8192)
 )
 
 func (r Rational) Num() int {

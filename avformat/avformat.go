@@ -50,6 +50,10 @@ type (
 	AvPacketSideDataType       C.enum_AVPacketSideDataType
 )
 
+const(
+	AVFMT_NOFILE = C.AVFMT_NOFILE
+)
+
 type File C.FILE
 
 //Allocate and read the payload of a packet and initialize its fields with default values.
@@ -72,6 +76,10 @@ func (f *InputFormat) AvRegisterInputFormat() {
 
 func (f *OutputFormat) AvRegisterOutputFormat() {
 	C.av_register_output_format((*C.struct_AVOutputFormat)(f))
+}
+
+func (f *OutputFormat) Flags() int32 {
+	return int32(f.flags)
 }
 
 //If f is NULL, returns the first registered input format, if f is non-NULL, returns the next registered input format after f or NULL if f is the last one.
@@ -133,6 +141,9 @@ func (s *Stream) AvStreamGetSideData(t AvPacketSideDataType, z int) *uint8 {
 func AvformatAllocOutputContext2(ctx **Context, o *OutputFormat, fo, fi string) int {
 	Cformat_name := C.CString(fo)
 	defer C.free(unsafe.Pointer(Cformat_name))
+	if fo == "" {
+		Cformat_name = nil
+	}
 
 	Cfilename := C.CString(fi)
 	defer C.free(unsafe.Pointer(Cfilename))
@@ -357,11 +368,9 @@ func AvformatGetMovAudioTags() *AvCodecTag {
 	return (*AvCodecTag)(C.avformat_get_mov_audio_tags())
 }
 
-func AvIOOpen(url string, flags int) (res *AvIOContext, err error) {
+func AvIOOpen(ctx **AvIOContext, url string, flags int32) error {
 	urlStr := C.CString(url)
 	defer C.free(unsafe.Pointer(urlStr))
 
-	err = avutil.ErrorFromCode(int(C.avio_open((**C.AVIOContext)(unsafe.Pointer(&res)), urlStr, C.int(flags))))
-
-	return
+	return avutil.ErrorFromCode(int(C.avio_open((**C.AVIOContext)(unsafe.Pointer(ctx)), urlStr, C.int(flags))))
 }
