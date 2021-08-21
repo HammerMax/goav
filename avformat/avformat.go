@@ -82,6 +82,14 @@ func (f *OutputFormat) Flags() int32 {
 	return int32(f.flags)
 }
 
+func (f *OutputFormat) VideoCodec() avcodec.CodecId {
+	return avcodec.CodecId(f.video_codec)
+}
+
+func (f *OutputFormat) AudioCodec() avcodec.CodecId {
+	return avcodec.CodecId(f.audio_codec)
+}
+
 //If f is NULL, returns the first registered input format, if f is non-NULL, returns the next registered input format after f or NULL if f is the last one.
 func (f *InputFormat) AvIformatNext() *InputFormat {
 	return (*InputFormat)(C.av_iformat_next((*C.struct_AVInputFormat)(f)))
@@ -138,7 +146,7 @@ func (s *Stream) AvStreamGetSideData(t AvPacketSideDataType, z int) *uint8 {
 }
 
 //Allocate an Context for an output format.
-func AvformatAllocOutputContext2(ctx **Context, o *OutputFormat, fo, fi string) int {
+func AvformatAllocOutputContext2(ctx **Context, o *OutputFormat, fo, fi string) error {
 	Cformat_name := C.CString(fo)
 	defer C.free(unsafe.Pointer(Cformat_name))
 	if fo == "" {
@@ -148,7 +156,7 @@ func AvformatAllocOutputContext2(ctx **Context, o *OutputFormat, fo, fi string) 
 	Cfilename := C.CString(fi)
 	defer C.free(unsafe.Pointer(Cfilename))
 
-	return int(C.avformat_alloc_output_context2((**C.struct_AVFormatContext)(unsafe.Pointer(ctx)), (*C.struct_AVOutputFormat)(o), Cformat_name, Cfilename))
+	return avutil.ErrorFromCode(int(C.avformat_alloc_output_context2((**C.struct_AVFormatContext)(unsafe.Pointer(ctx)), (*C.struct_AVOutputFormat)(o), Cformat_name, Cfilename)))
 }
 
 //Find InputFormat based on the short name of the input format.

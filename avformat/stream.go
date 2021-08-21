@@ -45,3 +45,7 @@ func (s *Stream) AvStreamGetParser() *CodecParserContext {
 func (s *Stream) AvStreamGetEndPts() int64 {
 	return int64(C.av_stream_get_end_pts((*C.struct_AVStream)(s)))
 }
+
+func (s *Stream) SetID(id int) {
+	s.id = C.int(id)
+}

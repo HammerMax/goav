@@ -74,7 +74,7 @@ func main() {
 		panic("codecCtx is nil")
 	}
 
-	if codecCtx.AvcodecOpen2(codec, nil) < 0 {
+	if codecCtx.AvcodecOpen2(codec, nil) != nil {
 		panic("can not open")
 	}
 

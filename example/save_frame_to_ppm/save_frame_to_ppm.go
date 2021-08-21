@@ -102,7 +102,7 @@ func main() {
 			}
 
 			// Open codec
-			if pCodecCtx.AvcodecOpen2(pCodec, nil) < 0 {
+			if pCodecCtx.AvcodecOpen2(pCodec, nil) != nil {
 				fmt.Println("Could not open codec")
 				os.Exit(1)
 			}

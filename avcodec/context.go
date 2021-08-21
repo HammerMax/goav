@@ -69,8 +69,8 @@ func (c *Context) AvcodecCopyContext(ctxt2 *Context) int {
 }
 
 //Initialize the Context to use the given Codec
-func (c *Context) AvcodecOpen2(codec *Codec, d **Dictionary) int {
-	return int(C.avcodec_open2((*C.struct_AVCodecContext)(c), (*C.struct_AVCodec)(codec), (**C.struct_AVDictionary)(unsafe.Pointer(d))))
+func (c *Context) AvcodecOpen2(codec *Codec, d **Dictionary) error {
+	return avutil.ErrorFromCode(int(C.avcodec_open2((*C.struct_AVCodecContext)(c), (*C.struct_AVCodec)(codec), (**C.struct_AVDictionary)(unsafe.Pointer(d)))))
 }
 
 //Close a given Context and free all the data associated with it (but not the Context itself).
@@ -79,8 +79,8 @@ func (c *Context) AvcodecClose() int {
 }
 
 //The default callback for Context.get_buffer2().
-func (c *Context) AvcodecDefaultGetBuffer2(f *Frame, l int) int {
-	return int(C.avcodec_default_get_buffer2((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(f), C.int(l)))
+func (c *Context) AvcodecDefaultGetBuffer2(f *avutil.Frame, l int) int {
+	return int(C.avcodec_default_get_buffer2((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(f)), C.int(l)))
 }
 
 //Modify width and height values so that they will result in a memory buffer that is acceptable for the codec if you do not use any horizontal padding.
@@ -94,13 +94,13 @@ func (c *Context) AvcodecAlignDimensions2(w, h *int, l int) {
 }
 
 //Decode the audio frame of size avpkt->size from avpkt->data into frame.
-func (c *Context) AvcodecDecodeAudio4(f *Frame, g *int, a *Packet) int {
-	return int(C.avcodec_decode_audio4((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(f), (*C.int)(unsafe.Pointer(g)), (*C.struct_AVPacket)(a)))
+func (c *Context) AvcodecDecodeAudio4(f *avutil.Frame, g *int, a *Packet) int {
+	return int(C.avcodec_decode_audio4((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(g)), (*C.struct_AVPacket)(a)))
 }
 
 //Decode the video frame of size avpkt->size from avpkt->data into picture.
-func (c *Context) AvcodecDecodeVideo2(p *Frame, g *int, a *Packet) int {
-	return int(C.avcodec_decode_video2((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(p), (*C.int)(unsafe.Pointer(g)), (*C.struct_AVPacket)(a)))
+func (c *Context) AvcodecDecodeVideo2(f *avutil.Frame, g *int, a *Packet) int {
+	return int(C.avcodec_decode_video2((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(g)), (*C.struct_AVPacket)(a)))
 }
 
 //Decode a subtitle message.
@@ -109,13 +109,13 @@ func (c *Context) AvcodecDecodeSubtitle2(s *AvSubtitle, g *int, a *Packet) int {
 }
 
 //Encode a frame of audio.
-func (c *Context) AvcodecEncodeAudio2(p *Packet, f *Frame, gp *int) int {
-	return int(C.avcodec_encode_audio2((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(p), (*C.struct_AVFrame)(f), (*C.int)(unsafe.Pointer(gp))))
+func (c *Context) AvcodecEncodeAudio2(p *Packet, f *avutil.Frame, gp *int) int {
+	return int(C.avcodec_encode_audio2((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(p), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(gp))))
 }
 
 //Encode a frame of video
-func (c *Context) AvcodecEncodeVideo2(p *Packet, f *Frame, gp *int) int {
-	return int(C.avcodec_encode_video2((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(p), (*C.struct_AVFrame)(f), (*C.int)(unsafe.Pointer(gp))))
+func (c *Context) AvcodecEncodeVideo2(p *Packet, f *avutil.Frame, gp *int) int {
+	return int(C.avcodec_encode_video2((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(p), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(gp))))
 }
 
 func (c *Context) AvcodecEncodeSubtitle(b *uint8, bs int, s *AvSubtitle) int {
@@ -187,6 +187,10 @@ func (c *Context) SetMaxBFrames(frames int) {
 
 func (c *Context) SetPixFmt(pixFmt PixelFormat) {
 	c.pix_fmt = C.enum_AVPixelFormat(pixFmt)
+}
+
+func (c *Context) SetSampleFmt(sampleFmt avutil.SampleFormat) {
+	c.sample_fmt = C.enum_AVSampleFormat(sampleFmt)
 }
 
 func (c *Context) SetEncodeParams2(width int, height int, pxlFmt PixelFormat, hasBframes bool, gopSize int) {

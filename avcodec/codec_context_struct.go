@@ -29,6 +29,22 @@ func (c *Context) SetBitRate(br int64) {
 	c.bit_rate = C.int64_t(br)
 }
 
+func (c *Context) SetChannels(channels int) {
+	c.channels = C.int(channels)
+}
+
+func (c *Context) SetChannelLayout(channelLayout int) {
+	c.channel_layout = C.uint64_t(channelLayout)
+}
+
+func (c *Context) SetSampleRate(sr int) {
+	c.sample_rate = C.int(sr)
+}
+
+func (c *Context) ChannelLayout() int {
+	return int(c.channel_layout)
+}
+
 func (c *Context) GetCodecId() CodecId {
 	return CodecId(c.codec_id)
 }

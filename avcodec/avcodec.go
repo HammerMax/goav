@@ -16,6 +16,8 @@ package avcodec
 //#include <libavutil/avutil.h>
 import "C"
 import (
+	"github.com/giorgisio/goav/avutil"
+	"reflect"
 	"unsafe"
 )
 
@@ -26,7 +28,6 @@ type (
 	Parser                        C.struct_AVCodecParser
 	ParserContext                 C.struct_AVCodecParserContext
 	Dictionary                    C.struct_AVDictionary
-	Frame                         C.struct_AVFrame
 	MediaType                     C.enum_AVMediaType
 	Packet                        C.struct_AVPacket
 	BitStreamFilter               C.struct_AVBitStreamFilter
@@ -221,11 +222,6 @@ func AvcodecString(b string, bs int, ctxt *Context, e int) {
 	C.avcodec_string(C.CString(b), C.int(bs), (*C.struct_AVCodecContext)(ctxt), C.int(e))
 }
 
-//Fill Frame audio data and linesize pointers.
-func AvcodecFillAudioFrame(f *Frame, c int, s AvSampleFormat, b *uint8, bs, a int) int {
-	return int(C.avcodec_fill_audio_frame((*C.struct_AVFrame)(f), C.int(c), (C.enum_AVSampleFormat)(s), (*C.uint8_t)(b), C.int(bs), C.int(a)))
-}
-
 //Return codec bits per sample.
 func AvGetBitsPerSample(c CodecId) int {
 	return int(C.av_get_bits_per_sample((C.enum_AVCodecID)(c)))
@@ -281,6 +277,16 @@ func AvcodecDescriptorGetByName(n string) *Descriptor {
 	return (*Descriptor)(C.avcodec_descriptor_get_by_name(C.CString(n)))
 }
 
-func (f *Frame) Pts() int64 {
-	return int64(f.pts)
+func (c *Codec) Type() avutil.MediaType {
+	return avutil.MediaType(c._type)
+}
+
+// SupportedSamplerates array of supported audio samplerates, or NULL if unknown, array is terminated by 0
+func (c *Codec) SupportedSamplerates() []int32 {
+	h := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(c.supported_samplerates)),
+		Len:  1000000,
+		Cap:  1000000,
+	}
+	return *(*[]int32)(unsafe.Pointer(&h))
 }

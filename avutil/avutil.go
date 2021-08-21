@@ -9,7 +9,7 @@ package avutil
 
 //#cgo pkg-config: libavutil
 //#include <libavutil/avutil.h>
-//#include <stdlib.h>
+//#include <libavutil/samplefmt.h>
 import "C"
 import (
 	"fmt"
@@ -28,6 +28,7 @@ type (
 	AvPictureType C.enum_AVPictureType
 	PixelFormat   C.enum_AVPixelFormat
 	AVRounding    C.enum_AVRounding
+	SampleFormat  C.enum_AVSampleFormat
 	File          C.FILE
 )
 

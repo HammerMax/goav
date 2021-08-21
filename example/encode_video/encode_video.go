@@ -70,7 +70,7 @@ func main() {
 		codecCtx.AvOptSet("preset", "slow", 0)
 	}
 
-	if codecCtx.AvcodecOpen2(codec, nil) < 0 {
+	if codecCtx.AvcodecOpen2(codec, nil) != nil {
 		fmt.Println("codec open error")
 		return
 	}
@@ -91,10 +91,9 @@ func main() {
 	frame.SetWidth(codecCtx.Width())
 	frame.SetHeight(codecCtx.Height())
 
-	bufferNumber := frame.AvFrameGetBuffer(0)
-	if bufferNumber < 0 {
-		fmt.Println("could not allocate the video frame data")
-		return
+	err = frame.AvFrameGetBuffer(0)
+	if err != nil {
+		panic(err)
 	}
 
 	// encode 1 second of video

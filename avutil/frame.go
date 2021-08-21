@@ -52,6 +52,18 @@ func (f *Frame) SetFormat(format int32) {
 	f.format = C.int(format)
 }
 
+func (f *Frame) SetChannelLayout(cl int) {
+	f.channel_layout = C.uint64_t(cl)
+}
+
+func (f *Frame) SetSampleRate(sr int) {
+	f.sample_rate = C.int(sr)
+}
+
+func (f *Frame) SetNbSamples(nbSamples int) {
+	f.nb_samples = C.int(nbSamples)
+}
+
 func (f *Frame) Width() int32 {
 	return (int32)(f.width)
 }
@@ -76,8 +88,8 @@ func (f *Frame) SetPts(pktPts int) {
 	f.pts = C.int64_t(pktPts)
 }
 
-func (f *Frame) AvFrameGetBuffer(align int32) int32 {
-	return int32(C.av_frame_get_buffer((*C.struct_AVFrame)(unsafe.Pointer(f)), C.int(align)))
+func (f *Frame) AvFrameGetBuffer(align int32) error {
+	return ErrorFromCode(int(C.av_frame_get_buffer((*C.struct_AVFrame)(unsafe.Pointer(f)), C.int(align))))
 }
 
 func (f *Frame) Data() [][]byte {
