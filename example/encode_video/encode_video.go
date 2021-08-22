@@ -9,16 +9,14 @@ import (
 
 func encode(encodeCtx *avcodec.Context, frame *avutil.Frame, packet *avcodec.Packet, outfile *os.File) {
 	fmt.Printf("Send frame %d\n", frame.Pts())
-	ret := encodeCtx.AvcodecSendFrame(frame)
-	if ret < 0 {
-		fmt.Println("error sending a frame for encoding")
-		return
+	err := encodeCtx.AvcodecSendFrame(frame)
+	if err != nil {
+		panic(err)
 	}
 
 	for {
-		ret = encodeCtx.AvcodecReceivePacket(packet)
-		if ret < 0 {
-			fmt.Printf("end. ret:%d", ret)
+		err = encodeCtx.AvcodecReceivePacket(packet)
+		if err != nil {
 			return
 		}
 
@@ -98,7 +96,7 @@ func main() {
 
 	// encode 1 second of video
 	for i:=0; i<25; i++ {
-		if frame.AvFrameMakeWritable() < 0 {
+		if frame.AvFrameMakeWritable() != nil {
 			fmt.Println("not writable")
 			return
 		}

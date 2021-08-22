@@ -28,14 +28,14 @@ func pgmSave(data []byte, wrap, x, y int32, filename string) {
 }
 
 func decode(ctx *avcodec.Context, frame *avutil.Frame, packet *avcodec.Packet, filename string) {
-	if ctx.AvcodecSendPacket(packet) < 0 {
+	if ctx.AvcodecSendPacket(packet) != nil {
 		panic("send packet error")
 	}
 
 	for {
 		ret := ctx.AvcodecReceiveFrame(frame)
 		fmt.Println("receive frame ret ", ret)
-		if ret < 0 {
+		if ret != nil {
 			return
 		}
 

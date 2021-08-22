@@ -225,18 +225,18 @@ func (c *Context) SetEncodeParams(width int, height int, pxlFmt PixelFormat) {
 	c.SetEncodeParams2(width, height, pxlFmt, false /*no b frames*/, 10)
 }
 
-func (c *Context) AvcodecSendPacket(packet *Packet) int {
-	return (int)(C.avcodec_send_packet((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(packet)))
+func (c *Context) AvcodecSendPacket(packet *Packet) error {
+	return avutil.ErrorFromCode((int)(C.avcodec_send_packet((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(packet))))
 }
 
-func (c *Context) AvcodecReceivePacket(pkt *Packet) int32 {
-	return (int32)(C.avcodec_receive_packet((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(pkt)))
+func (c *Context) AvcodecReceivePacket(pkt *Packet) error {
+	return avutil.ErrorFromCode((int)(C.avcodec_receive_packet((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(pkt))))
 }
 
-func (c *Context) AvcodecReceiveFrame(frame *avutil.Frame) int32 {
-	return (int32)(C.avcodec_receive_frame((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(frame))))
+func (c *Context) AvcodecReceiveFrame(frame *avutil.Frame) error {
+	return avutil.ErrorFromCode((int)(C.avcodec_receive_frame((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(frame)))))
 }
 
-func (c *Context) AvcodecSendFrame(frame *avutil.Frame) int32 {
-	return (int32)(C.avcodec_send_frame((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(frame))))
+func (c *Context) AvcodecSendFrame(frame *avutil.Frame) error {
+	return avutil.ErrorFromCode((int)(C.avcodec_send_frame((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(frame)))))
 }

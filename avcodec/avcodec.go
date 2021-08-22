@@ -290,3 +290,7 @@ func (c *Codec) SupportedSamplerates() []int32 {
 	}
 	return *(*[]int32)(unsafe.Pointer(&h))
 }
+
+func (cp *AvCodecParameters) AvCodecParametersFromContext(codec *Context) error {
+	return avutil.ErrorFromCode(int(C.avcodec_parameters_from_context((*C.struct_AVCodecParameters)(cp), (*C.struct_AVCodecContext)(codec))))
+}

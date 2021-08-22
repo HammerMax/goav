@@ -152,8 +152,8 @@ func (s *Context) AvWriteFrame(pkt *avcodec.Packet) int {
 }
 
 //Write a packet to an output media file ensuring correct interleaving.
-func (s *Context) AvInterleavedWriteFrame(pkt *avcodec.Packet) int {
-	return int(C.av_interleaved_write_frame((*C.struct_AVFormatContext)(s), toCPacket(pkt)))
+func (s *Context) AvInterleavedWriteFrame(pkt *avcodec.Packet) error {
+	return avutil.ErrorFromCode(int(C.av_interleaved_write_frame((*C.struct_AVFormatContext)(s), toCPacket(pkt))))
 }
 
 //Write a uncoded frame to an output media file.

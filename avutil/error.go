@@ -19,9 +19,20 @@ const (
 	AvErrorEAGAIN = -35
 )
 
+var ErrEOF = errors.New("eof")
+var ErrEAGAIN = errors.New("again")
+
 func ErrorFromCode(code int) error {
 	if code >= 0 {
 		return nil
+	}
+
+	if code == AvErrorEOF {
+		return ErrEOF
+	}
+
+	if code == AvErrorEAGAIN {
+		return ErrEAGAIN
 	}
 
 	return errors.New(C.GoString(C.error2string(C.int(code))))

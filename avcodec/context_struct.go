@@ -3,6 +3,8 @@
 
 package avcodec
 
+import "github.com/giorgisio/goav/avutil"
+
 func (c *Context) ActiveThreadType() int {
 	return int(c.active_thread_type)
 }
@@ -523,16 +525,16 @@ func (c *Context) FieldOrder() AvFieldOrder {
 	return (AvFieldOrder)(c.field_order)
 }
 
-func (c *Context) PixFmt() PixelFormat {
-	return (PixelFormat)(c.pix_fmt)
+func (c *Context) PixFmt() avutil.PixelFormat {
+	return (avutil.PixelFormat)(c.pix_fmt)
 }
 
 func (c *Context) RequestSampleFmt() AvSampleFormat {
 	return (AvSampleFormat)(c.request_sample_fmt)
 }
 
-func (c *Context) SampleFmt() AvSampleFormat {
-	return (AvSampleFormat)(c.sample_fmt)
+func (c *Context) SampleFmt() avutil.SampleFormat {
+	return (avutil.SampleFormat)(c.sample_fmt)
 }
 
 func (c *Context) SkipFrame() AvDiscard {

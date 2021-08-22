@@ -5,6 +5,8 @@ import (
 	"github.com/giorgisio/goav/avcodec"
 	"github.com/giorgisio/goav/avformat"
 	"github.com/giorgisio/goav/avutil"
+	"github.com/giorgisio/goav/swresample"
+	"github.com/giorgisio/goav/swscale"
 	"math"
 	"os"
 )
@@ -43,7 +45,33 @@ func main() {
 		AddStream(&audioSt, formatCtx, &audioCodec, ofmt.AudioCodec())
 	}
 
+	OpenVideo(formatCtx, videoCodec, &videoSt, nil)
+	OpenAudio(formatCtx, audioCodec, &audioSt, nil)
 
+	formatCtx.AvDumpFormat(0, filename, 1)
+
+	err = avformat.AvIOOpen(formatCtx.Pb2(), filename, avformat.AVIO_FLAG_WRITE)
+	if err != nil {
+		panic(err)
+	}
+
+	err = formatCtx.AvformatWriteHeader(nil)
+	if err != nil {
+		panic(err)
+	}
+
+	encodeVideo := 0
+	encodeAudio := 0
+
+	for encodeVideo == 0 || encodeAudio == 0 {
+		if encodeVideo == 0 && (encodeAudio != 0 || avutil.AvCompareTs(videoSt.nextPts, videoSt.enc.GetTimeBase(), audioSt.nextPts, audioSt.enc.GetTimeBase()) <= 0) {
+			encodeVideo = writeVideoFrame(formatCtx, &videoSt)
+		} else {
+			encodeAudio = writeAudioFrame(formatCtx, &audioSt)
+		}
+	}
+
+	formatCtx.AvWriteTrailer()
 }
 
 type OutputStream struct {
@@ -57,6 +85,9 @@ type OutputStream struct {
 	tmpFrame *avutil.Frame
 
 	t, tincr, tincr2 float64
+
+	swrCtx *swresample.Context
+	swsCtx *swscale.Context
 }
 
 func AddStream(ost *OutputStream, fmtCtx *avformat.Context, codec **avcodec.Codec, codecId avcodec.CodecId) {
@@ -116,6 +147,31 @@ func OpenAudio(fmtCtx *avformat.Context, codec *avcodec.Codec, ost *OutputStream
 
 	ost.frame = AllocAudioFrame(c.SampleFmt(), c.ChannelLayout(), c.SampleRate(), nbSamples)
 	ost.tmpFrame = AllocAudioFrame(avutil.AV_SAMPLE_FMT_S16, c.ChannelLayout(), c.SampleRate(), nbSamples)
+
+	err = ost.st.CodecParameters().AvCodecParametersFromContext(c)
+	if err != nil {
+		panic(err)
+	}
+
+	ost.swrCtx = swresample.SwrAlloc()
+	if ost.swrCtx == nil {
+		panic("swr alloc error")
+	}
+
+	err = avutil.AvOptSetInt(ost.swrCtx, "in_channel_count", c.Channels(), 0)
+	if err != nil {
+		panic(err)
+	}
+	_ = avutil.AvOptSetInt(ost.swrCtx, "in_sample_rate", c.SampleRate(), 0)
+	_ = avutil.AvOptSetSampleFmt(ost.swrCtx, "in_sample_fmt", avutil.AV_SAMPLE_FMT_S16, 0)
+	_ = avutil.AvOptSetInt(ost.swrCtx, "out_channel_count", c.Channels(), 0)
+	_ = avutil.AvOptSetInt(ost.swrCtx, "out_sample_rate", c.SampleRate(), 0)
+	_ = avutil.AvOptSetSampleFmt(ost.swrCtx, "out_sample_fmt", c.SampleFmt(), 0)
+
+	err = ost.swrCtx.SwrInit()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func AllocAudioFrame(sampleFmt avutil.SampleFormat, channelLayout int, sampleRage int, nbSamples int) *avutil.Frame {
@@ -124,7 +180,7 @@ func AllocAudioFrame(sampleFmt avutil.SampleFormat, channelLayout int, sampleRag
 		panic("alloc frame error")
 	}
 
-	frame.SetFormat(sampleFmt)
+	frame.SetFormat(int32(sampleFmt))
 	frame.SetChannelLayout(channelLayout)
 	frame.SetSampleRate(sampleRage)
 	frame.SetNbSamples(nbSamples)
@@ -135,5 +191,130 @@ func AllocAudioFrame(sampleFmt avutil.SampleFormat, channelLayout int, sampleRag
 			panic(err)
 		}
 	}
+	return frame
+}
+
+func OpenVideo(fmtCtx *avformat.Context, codec *avcodec.Codec, ost *OutputStream, arg *avutil.Dictionary) {
+	c := ost.enc
+
+	err := c.AvcodecOpen2(codec, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	ost.frame = allocPicture(c.PixFmt(), c.Width(), c.Height())
+	if ost.frame == nil {
+		panic(err)
+	}
+
+	err = ost.st.CodecParameters().AvCodecParametersFromContext(c)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func allocPicture(pixFmt avutil.PixelFormat, width, height int32) *avutil.Frame {
+	picture := avutil.AvFrameAlloc()
+	if picture == nil {
+		panic("alloc frame error")
+	}
+
+	picture.SetFormat(int32(pixFmt))
+	picture.SetWidth(width)
+	picture.SetHeight(height)
+
+	err := picture.AvFrameGetBuffer(0)
+	if err != nil {
+		panic(err)
+	}
+
+	return picture
+}
+
+func writeVideoFrame(formatCtx *avformat.Context, ost *OutputStream) int {
+	return writeFrame(formatCtx, ost.enc, ost.st, getVideoFrame(ost))
+}
+
+func getVideoFrame(ost *OutputStream) *avutil.Frame {
+	c := ost.enc
+
+	if avutil.AvCompareTs(ost.nextPts, c.GetTimeBase(), 10, avutil.NewRational(1, 1)) > 0 {
+		return nil
+	}
+
+	err := ost.frame.AvFrameMakeWritable()
+	if err != nil {
+		panic(err)
+	}
+
+	fillYuvImage(ost.frame, ost.nextPts, int(c.Width()), int(c.Height()))
+
+	ost.frame.SetPts(ost.nextPts)
+	ost.nextPts++
+	return ost.frame
+}
+
+func fillYuvImage(frame *avutil.Frame, frameIndex, width, height int) {
+	i := frameIndex
+
+	for y:=0; y<height; y++ {
+		for x:=0; x<width; x++ {
+			frame.SetDataSimple(0, y*int(frame.LineSize()[0]) + x, uint8(x + y + i * 3))
+		}
+	}
+	for y:=0; y<height/2; y++ {
+		for x:=0; x<width/2; x++ {
+			frame.SetDataSimple(1, y * int(frame.LineSize()[1]) + x, uint8(128 + y + i * 2))
+			frame.SetDataSimple(2, y * int(frame.LineSize()[2]) + x, uint8(64 + x + i * 5))
+		}
+	}
+}
+
+func writeFrame(formatCtx *avformat.Context, c *avcodec.Context, st *avformat.Stream, frame *avutil.Frame) int {
+	err := c.AvcodecSendFrame(frame)
+	if err != nil {
+		panic(err)
+	}
+
+	for err == nil {
+		pkt := avcodec.AvPacketAlloc()
+
+		err = c.AvcodecReceivePacket(pkt)
+		if err == avutil.ErrEAGAIN || err == avutil.ErrEOF {
+			break
+		} else if err != nil {
+			panic(err)
+		}
+
+		pkt.AvPacketRescaleTs(c.GetTimeBase(), st.TimeBase())
+		pkt.SetStreamIndex(st.Index())
+
+		err = formatCtx.AvInterleavedWriteFrame(pkt)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	if err == avutil.ErrEOF {
+		return 1
+	}
+	return 0
+}
+
+func writeAudioFrame(formatCtx *avformat.Context, ost *OutputStream) int {
+	return -1
+	c := ost.enc
+	frame := getAudioFrame(ost)
+	err := frame.AvFrameMakeWritable()
+	if err != nil {
+		panic(err)
+	}
+	return writeFrame(formatCtx, c, ost.st, frame)
+}
+
+func getAudioFrame(ost *OutputStream) *avutil.Frame {
+	frame :=ost.tmpFrame
+	frame.SetPts(ost.nextPts)
+	ost.nextPts += frame.NbSamples()
 	return frame
 }

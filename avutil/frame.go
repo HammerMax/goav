@@ -64,6 +64,10 @@ func (f *Frame) SetNbSamples(nbSamples int) {
 	f.nb_samples = C.int(nbSamples)
 }
 
+func (f *Frame) NbSamples() int {
+	return (int)(f.nb_samples)
+}
+
 func (f *Frame) Width() int32 {
 	return (int32)(f.width)
 }
@@ -154,8 +158,8 @@ func AvFrameMoveRef(d, s *Frame) {
 	C.av_frame_move_ref((*C.struct_AVFrame)(unsafe.Pointer(d)), (*C.struct_AVFrame)(unsafe.Pointer(s)))
 }
 
-func (f *Frame) AvFrameMakeWritable() int32 {
-	return int32(C.av_frame_make_writable((*C.struct_AVFrame)(unsafe.Pointer(f))))
+func (f *Frame) AvFrameMakeWritable() error {
+	return ErrorFromCode(int(C.av_frame_make_writable((*C.struct_AVFrame)(unsafe.Pointer(f)))))
 }
 
 //Copy only "metadata" fields from src to dst.

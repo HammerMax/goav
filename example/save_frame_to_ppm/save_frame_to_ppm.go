@@ -150,15 +150,15 @@ func main() {
 				if packet.StreamIndex() == i {
 					// Decode video frame
 					response := pCodecCtx.AvcodecSendPacket(packet)
-					if response < 0 {
-						fmt.Printf("Error while sending a packet to the decoder: %s\n", avutil.ErrorFromCode(response))
+					if response != nil {
+						fmt.Printf("Error while sending a packet to the decoder: %s\n", response)
 					}
-					for response >= 0 {
-						response = int(pCodecCtx.AvcodecReceiveFrame((*avutil.Frame)(unsafe.Pointer(pFrame))))
-						if response == avutil.AvErrorEAGAIN || response == avutil.AvErrorEOF {
+					for response == nil {
+						response = pCodecCtx.AvcodecReceiveFrame((*avutil.Frame)(unsafe.Pointer(pFrame)))
+						if response == avutil.ErrEAGAIN || response == avutil.ErrEOF {
 							break
-						} else if response < 0 {
-							fmt.Printf("Error while receiving a frame from the decoder: %s\n", avutil.ErrorFromCode(response))
+						} else if response != nil {
+							fmt.Printf("Error while receiving a frame from the decoder: %s\n", response)
 							return
 						}
 

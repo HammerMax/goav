@@ -9,12 +9,13 @@ package swresample
 */
 import "C"
 import (
+	"github.com/giorgisio/goav/avutil"
 	"unsafe"
 )
 
 //Initialize context after user parameters have been set.
-func (s *Context) SwrInit() int {
-	return int(C.swr_init((*C.struct_SwrContext)(s)))
+func (s *Context) SwrInit() error {
+	return avutil.ErrorFromCode(int(C.swr_init((*C.struct_SwrContext)(s))))
 }
 
 //Check whether an swr context has been initialized or not.

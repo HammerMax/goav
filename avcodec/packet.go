@@ -7,6 +7,7 @@ package avcodec
 //#include <libavcodec/avcodec.h>
 import "C"
 import (
+	"github.com/giorgisio/goav/avutil"
 	"unsafe"
 )
 
@@ -117,6 +118,6 @@ func (p *Packet) AvPacketCopyProps(s *Packet) int {
 }
 
 ////Convert valid timing fields (timestamps / durations) in a packet from one timebase to another.
-//func (p *Packet) AvPacketRescaleTs(r, r2 avutil.Rational) {
-//	C.av_packet_rescale_ts((*C.struct_AVPacket)(p), (C.struct_AVRational)(r), (C.struct_AVRational)(r2))
-//}
+func (p *Packet) AvPacketRescaleTs(r, r2 avutil.Rational) {
+	C.av_packet_rescale_ts((*C.struct_AVPacket)(p), *(*C.struct_AVRational)(unsafe.Pointer(&r)), *(*C.struct_AVRational)(unsafe.Pointer(&r2)))
+}
