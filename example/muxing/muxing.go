@@ -127,7 +127,7 @@ func AddStream(ost *OutputStream, fmtCtx *avformat.Context, codec **avcodec.Code
 		ost.st.SetTimeBase(avutil.NewRational(1, 25))
 		c.SetTimeBase(ost.st.TimeBase())
 		c.SetGopSize(12)
-		c.SetPixFmt(avcodec.AV_PIX_FMT_YUV420P)
+		c.SetPixFmt(avutil.AV_PIX_FMT_YUV420P)
 	}
 }
 

@@ -62,7 +62,7 @@ func main() {
 	codecCtx.SetHeight(288)
 	codecCtx.SetTimebase(1, 25)
 	codecCtx.SetFramerate(25, 1)
-	codecCtx.SetPixFmt(avcodec.AV_PIX_FMT_YUV420P)
+	codecCtx.SetPixFmt(avutil.AV_PIX_FMT_YUV420P)
 
 	if codec.Id() == avcodec.AV_CODEC_ID_H264 {
 		codecCtx.AvOptSet("preset", "slow", 0)

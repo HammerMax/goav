@@ -15,6 +15,7 @@ package swscale
 //#include <libswscale/swscale.h>
 import "C"
 import (
+	"reflect"
 	"unsafe"
 )
 
@@ -24,6 +25,39 @@ type (
 	Vector      C.struct_SwsVector
 	Class       C.struct_AVClass
 	PixelFormat C.enum_AVPixelFormat
+)
+
+const (
+ SWS_FAST_BILINEAR        =C.SWS_FAST_BILINEAR
+ SWS_BILINEAR             =C.SWS_BILINEAR
+ SWS_BICUBIC              =C.SWS_BICUBIC
+ SWS_X                    =C.SWS_X
+ SWS_POINT                =C.SWS_POINT
+ SWS_AREA                 =C.SWS_AREA
+ SWS_BICUBLIN             =C.SWS_BICUBLIN
+ SWS_GAUSS                =C.SWS_GAUSS
+ SWS_SINC                 =C.SWS_SINC
+ SWS_LANCZOS              =C.SWS_LANCZOS
+ SWS_SPLINE               =C.SWS_SPLINE
+ SWS_SRC_V_CHR_DROP_MASK  =C.SWS_SRC_V_CHR_DROP_MASK
+ SWS_SRC_V_CHR_DROP_SHIFT =C.SWS_SRC_V_CHR_DROP_SHIFT
+ SWS_PARAM_DEFAULT        =C.SWS_PARAM_DEFAULT
+ SWS_PRINT_INFO           =C.SWS_PRINT_INFO
+ SWS_FULL_CHR_H_INT       =C.SWS_FULL_CHR_H_INT
+ SWS_FULL_CHR_H_INP       =C.SWS_FULL_CHR_H_INP
+ SWS_DIRECT_BGR           =C.SWS_DIRECT_BGR
+ SWS_ACCURATE_RND         =C.SWS_ACCURATE_RND
+ SWS_BITEXACT             =C.SWS_BITEXACT
+ SWS_ERROR_DIFFUSION      =C.SWS_ERROR_DIFFUSION
+ SWS_MAX_REDUCE_CUTOFF    =C.SWS_MAX_REDUCE_CUTOFF
+ SWS_CS_ITU709            =C.SWS_CS_ITU709
+ SWS_CS_FCC               =C.SWS_CS_FCC
+ SWS_CS_ITU601            =C.SWS_CS_ITU601
+ SWS_CS_ITU624            =C.SWS_CS_ITU624
+ SWS_CS_SMPTE170M         =C.SWS_CS_SMPTE170M
+ SWS_CS_SMPTE240M         =C.SWS_CS_SMPTE240M
+ SWS_CS_DEFAULT           =C.SWS_CS_DEFAULT
+ SWS_CS_BT2020            =C.SWS_CS_BT2020
 )
 
 //Return the LIBSWSCALE_VERSION_INT constant.
@@ -78,6 +112,28 @@ func SwsScale2(ctxt *Context, srcData [8]*uint8, srcStride [8]int32, y, h int32,
 	cd := (**C.uint8_t)(unsafe.Pointer(&dstData[0]))
 	cds := (*C.int)(unsafe.Pointer(&dstStride))
 	return int(C.sws_scale(cctxt, csrc, cstr, C.int(y), C.int(h), cd, cds))
+}
+
+func (c *Context) SwsScale(srcSlice [][]byte, srcStride []int32, srcSliceY, srcSliceH int, dst [][]byte, dstStride []int32) int {
+	var srcSlicePointers []unsafe.Pointer
+	for k := range srcSlice {
+		srcSlicePointers = append(srcSlicePointers, unsafe.Pointer(&srcSlice[k][0]))
+	}
+
+	var dstSlicePointers []unsafe.Pointer
+	for k := range dst {
+		dstSlicePointers = append(dstSlicePointers, unsafe.Pointer(&dst[k][0]))
+	}
+
+	ret := int(C.sws_scale((*C.struct_SwsContext)(unsafe.Pointer(c)), (**C.uint8_t)(unsafe.Pointer(&srcSlicePointers[0])), (*C.int)(unsafe.Pointer(&srcStride[0])), C.int(srcSliceY), C.int(srcSliceH), (**C.uint8_t)(unsafe.Pointer(&dstSlicePointers[0])), (*C.int)(unsafe.Pointer(&dstStride[0]))))
+
+	for k, v := range dstSlicePointers {
+		header := (*reflect.SliceHeader)(unsafe.Pointer(&dst[k]))
+		header.Data = uintptr(v)
+		header.Len = 10000000
+		header.Cap = 10000000
+	}
+	return ret
 }
 
 func SwsSetcolorspacedetails(ctxt *Context, it *int, sr int, t *int, dr, b, c, s int) int {

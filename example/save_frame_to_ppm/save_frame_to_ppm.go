@@ -118,7 +118,7 @@ func main() {
 			}
 
 			// Determine required buffer size and allocate buffer
-			numBytes := uintptr(avcodec.AvpictureGetSize(avcodec.AV_PIX_FMT_RGB24, pCodecCtx.Width(),
+			numBytes := uintptr(avcodec.AvpictureGetSize(avutil.AV_PIX_FMT_RGB24, pCodecCtx.Width(),
 				pCodecCtx.Height()))
 			buffer := avutil.AvMalloc(numBytes)
 
@@ -126,16 +126,16 @@ func main() {
 			// Note that pFrameRGB is an AVFrame, but AVFrame is a superset
 			// of AVPicture
 			avp := (*avcodec.Picture)(unsafe.Pointer(pFrameRGB))
-			avp.AvpictureFill((*uint8)(buffer), avcodec.AV_PIX_FMT_RGB24, pCodecCtx.Width(), pCodecCtx.Height())
+			avp.AvpictureFill((*uint8)(buffer), avutil.AV_PIX_FMT_RGB24, pCodecCtx.Width(), pCodecCtx.Height())
 
 			// initialize SWS context for software scaling
-			swsCtx := swscale.SwsGetcontext(
-				pCodecCtx.Width(),
-				pCodecCtx.Height(),
+			swsCtx := swscale.SwsGetContext(
+				int(pCodecCtx.Width()),
+				int(pCodecCtx.Height()),
 				(swscale.PixelFormat)(pCodecCtx.PixFmt()),
-				pCodecCtx.Width(),
-				pCodecCtx.Height(),
-				swscale.PixelFormat(avcodec.AV_PIX_FMT_RGB24),
+				int(pCodecCtx.Width()),
+				int(pCodecCtx.Height()),
+				swscale.PixelFormat(avutil.AV_PIX_FMT_RGB24),
 				avcodec.SWS_BILINEAR,
 				nil,
 				nil,

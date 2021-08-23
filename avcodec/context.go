@@ -185,7 +185,7 @@ func (c *Context) SetMaxBFrames(frames int) {
 	c.max_b_frames = C.int(frames)
 }
 
-func (c *Context) SetPixFmt(pixFmt PixelFormat) {
+func (c *Context) SetPixFmt(pixFmt avutil.PixelFormat) {
 	c.pix_fmt = C.enum_AVPixelFormat(pixFmt)
 }
 

@@ -7,6 +7,9 @@ package swscale
 //#include <libswscale/swscale.h>
 import "C"
 import (
+	"github.com/giorgisio/goav/avfilter"
+	"github.com/giorgisio/goav/avutil"
+	"reflect"
 	"unsafe"
 )
 
@@ -26,9 +29,9 @@ func SwsFreecontext(ctxt *Context) {
 }
 
 //Allocate and return an Context.
-func SwsGetcontext(sw, sh int32, sf PixelFormat, dw, dh int32, df PixelFormat, f int, sfl, dfl *Filter,
-	p *int) *Context {
-	return (*Context)(C.sws_getContext(C.int(sw), C.int(sh), (C.enum_AVPixelFormat)(sf), C.int(dw), C.int(dh), (C.enum_AVPixelFormat)(df), C.int(f), (*C.struct_SwsFilter)(sfl), (*C.struct_SwsFilter)(dfl), (*C.double)(unsafe.Pointer(p))))
+func SwsGetContext(sw, sh int, sf avutil.PixelFormat, dw, dh int, df avutil.PixelFormat, f int, sfl, dfl *avfilter.Filter, param []float64) *Context {
+	h := (*reflect.SliceHeader)(unsafe.Pointer(&param))
+	return (*Context)(C.sws_getContext(C.int(sw), C.int(sh), (C.enum_AVPixelFormat)(sf), C.int(dw), C.int(dh), (C.enum_AVPixelFormat)(df), C.int(f), (*C.struct_SwsFilter)(unsafe.Pointer(sfl)), (*C.struct_SwsFilter)(unsafe.Pointer(dfl)), (*C.double)(unsafe.Pointer(h.Data))))
 }
 
 //Check if context can be reused, otherwise reallocate a new one.
