@@ -61,6 +61,26 @@ func (cp *AvCodecParameters) AvCodecGetId() CodecId {
 	return *((*CodecId)(unsafe.Pointer(&cp.codec_id)))
 }
 
+func (cp *AvCodecParameters) CodecId() CodecId {
+	return CodecId(cp.codec_id)
+}
+
+func (cp *AvCodecParameters) CodecType() avutil.MediaType {
+	return avutil.MediaType(cp.codec_type)
+}
+
+func (cp *AvCodecParameters) Width() int {
+	return int(cp.width)
+}
+
+func (cp *AvCodecParameters) Height() int {
+	return int(cp.height)
+}
+
+func (cp *AvCodecParameters) Format() int {
+	return int(cp.format)
+}
+
 func (cp *AvCodecParameters) AvCodecGetType() MediaType {
 	return *((*MediaType)(unsafe.Pointer(&cp.codec_type)))
 }

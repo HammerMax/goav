@@ -23,3 +23,7 @@ const (
 
 		AV_SAMPLE_FMT_NB = C.AV_SAMPLE_FMT_NB
 )
+
+func AvGetSampleFmtName(sampleFmt SampleFormat) string {
+	return C.GoString(C.av_get_sample_fmt_name(C.enum_AVSampleFormat(sampleFmt)))
+}
