@@ -17,13 +17,6 @@ const (
 	AV_PKT_FLAG_DISCARD = int(C.AV_PKT_FLAG_DISCARD)
 )
 
-//Initialize optional fields of a packet with default values.
-func (p *Packet) AvInitPacket() {
-	C.av_init_packet((*C.struct_AVPacket)(p))
-	p.size = 0
-	p.data = nil
-}
-
 //Allocate the payload of a packet and initialize its fields with default values.
 func (p *Packet) AvNewPacket(s int) int {
 	return int(C.av_new_packet((*C.struct_AVPacket)(p), C.int(s)))
@@ -45,23 +38,6 @@ func (p *Packet) AvPacketFromData(d *uint8, s int) int {
 
 }
 
-func (p *Packet) AvDupPacket() int {
-	return int(C.av_dup_packet((*C.struct_AVPacket)(p)))
-
-}
-
-//Copy packet, including contents.
-func (p *Packet) AvCopyPacket(r *Packet) int {
-	return int(C.av_copy_packet((*C.struct_AVPacket)(p), (*C.struct_AVPacket)(r)))
-
-}
-
-//Copy packet side data.
-func (p *Packet) AvCopyPacketSideData(r *Packet) int {
-	return int(C.av_copy_packet_side_data((*C.struct_AVPacket)(p), (*C.struct_AVPacket)(r)))
-
-}
-
 //Free a packet.
 func (p *Packet) AvPacketFree() {
 	C.av_packet_free((**C.struct_AVPacket)(unsafe.Pointer(&p)))
@@ -80,16 +56,6 @@ func (p *Packet) AvPacketShrinkSideData(t AvPacketSideDataType, s int) int {
 //Get side information from packet.
 func (p *Packet) AvPacketGetSideData(t AvPacketSideDataType, s *int) *uint8 {
 	return (*uint8)(C.av_packet_get_side_data((*C.struct_AVPacket)(p), (C.enum_AVPacketSideDataType)(t), (*C.int)(unsafe.Pointer(s))))
-}
-
-//int 	av_packet_merge_side_data (Packet *pkt)
-func (p *Packet) AvPacketMergeSideData() int {
-	return int(C.av_packet_merge_side_data((*C.struct_AVPacket)(p)))
-}
-
-//int 	av_packet_split_side_data (Packet *pkt)
-func (p *Packet) AvPacketSplitSideData() int {
-	return int(C.av_packet_split_side_data((*C.struct_AVPacket)(p)))
 }
 
 //Convenience function to free all the side data stored.

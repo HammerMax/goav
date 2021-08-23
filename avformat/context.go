@@ -21,50 +21,6 @@ const (
 	AvseekFlagFrame    = 8 ///< seeking based on frame number
 )
 
-func (s *Context) AvFormatGetProbeScore() int {
-	return int(C.av_format_get_probe_score((*C.struct_AVFormatContext)(s)))
-}
-
-func (s *Context) AvFormatGetVideoCodec() *avcodec.Codec {
-	return CToCodec(C.av_format_get_video_codec((*C.struct_AVFormatContext)(s)))
-}
-
-func (s *Context) AvFormatSetVideoCodec(c *avcodec.Codec) {
-	C.av_format_set_video_codec((*C.struct_AVFormatContext)(s), CodecToC(c))
-}
-
-func (s *Context) AvFormatGetAudioCodec() *avcodec.Codec {
-	return CToCodec(C.av_format_get_audio_codec((*C.struct_AVFormatContext)(s)))
-}
-
-func (s *Context) AvFormatSetAudioCodec(c *avcodec.Codec) {
-	C.av_format_set_audio_codec((*C.struct_AVFormatContext)(s), CodecToC(c))
-}
-
-func (s *Context) AvFormatGetSubtitleCodec() *avcodec.Codec {
-	return CToCodec(C.av_format_get_subtitle_codec((*C.struct_AVFormatContext)(s)))
-}
-
-func (s *Context) AvFormatSetSubtitleCodec(c *avcodec.Codec) {
-	C.av_format_set_subtitle_codec((*C.struct_AVFormatContext)(s), CodecToC(c))
-}
-
-func (s *Context) AvFormatGetMetadataHeaderPadding() int {
-	return int(C.av_format_get_metadata_header_padding((*C.struct_AVFormatContext)(s)))
-}
-
-func (s *Context) AvFormatSetMetadataHeaderPadding(c int) {
-	C.av_format_set_metadata_header_padding((*C.struct_AVFormatContext)(s), C.int(c))
-}
-
-func (s *Context) AvFormatGetOpaque() {
-	C.av_format_get_opaque((*C.struct_AVFormatContext)(s))
-}
-
-func (s *Context) AvFormatSetOpaque(o int) {
-	C.av_format_set_opaque((*C.struct_AVFormatContext)(s), unsafe.Pointer(&o))
-}
-
 //This function will cause global side data to be injected in the next packet of each stream as well as after any subsequent seek.
 func (s *Context) AvFormatInjectGlobalSideData() {
 	C.av_format_inject_global_side_data((*C.struct_AVFormatContext)(s))
@@ -90,8 +46,8 @@ func (s *Context) AvNewProgram(id int) *AvProgram {
 }
 
 //Read packets of a media file to get stream information.
-func (s *Context) AvformatFindStreamInfo(d **avutil.Dictionary) int {
-	return int(C.avformat_find_stream_info((*C.struct_AVFormatContext)(s), (**C.struct_AVDictionary)(unsafe.Pointer(d))))
+func (s *Context) AvformatFindStreamInfo(d **avutil.Dictionary) error {
+	return avutil.ErrorFromCode(int(C.avformat_find_stream_info((*C.struct_AVFormatContext)(s), (**C.struct_AVDictionary)(unsafe.Pointer(d)))))
 }
 
 //Find the programs which belong to a given stream.

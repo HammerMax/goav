@@ -13,45 +13,6 @@ import (
 	"unsafe"
 )
 
-func (c *Context) AvCodecGetPktTimebase() avutil.Rational {
-	return avutilRational(C.av_codec_get_pkt_timebase((*C.struct_AVCodecContext)(c)))
-}
-
-func (c *Context) AvCodecSetPktTimebase(r avutil.Rational) {
-	C.av_codec_set_pkt_timebase((*C.struct_AVCodecContext)(c), toRational(r))
-}
-
-func (c *Context) AvCodecGetCodecDescriptor() *Descriptor {
-	return (*Descriptor)(C.av_codec_get_codec_descriptor((*C.struct_AVCodecContext)(c)))
-}
-
-func (c *Context) AvCodecSetCodecDescriptor(d *Descriptor) {
-	C.av_codec_set_codec_descriptor((*C.struct_AVCodecContext)(c), (*C.struct_AVCodecDescriptor)(d))
-}
-
-func (c *Context) AvCodecGetLowres() int {
-	return int(C.av_codec_get_lowres((*C.struct_AVCodecContext)(c)))
-}
-
-func (c *Context) AvCodecSetLowres(i int) {
-	C.av_codec_set_lowres((*C.struct_AVCodecContext)(c), C.int(i))
-}
-
-func (c *Context) AvCodecGetSeekPreroll() int {
-	return int(C.av_codec_get_seek_preroll((*C.struct_AVCodecContext)(c)))
-}
-
-func (c *Context) AvCodecSetSeekPreroll(i int) {
-	C.av_codec_set_seek_preroll((*C.struct_AVCodecContext)(c), C.int(i))
-}
-
-func (c *Context) AvCodecGetChromaIntraMatrix() *uint16 {
-	return (*uint16)(C.av_codec_get_chroma_intra_matrix((*C.struct_AVCodecContext)(c)))
-}
-
-func (c *Context) AvCodecSetChromaIntraMatrix(t *uint16) {
-	C.av_codec_set_chroma_intra_matrix((*C.struct_AVCodecContext)(c), (*C.uint16_t)(t))
-}
 
 //Free the codec context and everything associated with it and write NULL to the provided pointer.
 func (c *Context) AvcodecFreeContext() {
@@ -61,11 +22,6 @@ func (c *Context) AvcodecFreeContext() {
 //Set the fields of the given Context to default values corresponding to the given codec (defaults may be codec-dependent).
 func (c *Context) AvcodecGetContextDefaults3(codec *Codec) int {
 	return int(C.avcodec_get_context_defaults3((*C.struct_AVCodecContext)(c), (*C.struct_AVCodec)(codec)))
-}
-
-//Copy the settings of the source Context into the destination Context.
-func (c *Context) AvcodecCopyContext(ctxt2 *Context) int {
-	return int(C.avcodec_copy_context((*C.struct_AVCodecContext)(c), (*C.struct_AVCodecContext)(ctxt2)))
 }
 
 //Initialize the Context to use the given Codec
@@ -93,29 +49,9 @@ func (c *Context) AvcodecAlignDimensions2(w, h *int, l int) {
 	C.avcodec_align_dimensions2((*C.struct_AVCodecContext)(c), (*C.int)(unsafe.Pointer(w)), (*C.int)(unsafe.Pointer(h)), (*C.int)(unsafe.Pointer(&l)))
 }
 
-//Decode the audio frame of size avpkt->size from avpkt->data into frame.
-func (c *Context) AvcodecDecodeAudio4(f *avutil.Frame, g *int, a *Packet) int {
-	return int(C.avcodec_decode_audio4((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(g)), (*C.struct_AVPacket)(a)))
-}
-
-//Decode the video frame of size avpkt->size from avpkt->data into picture.
-func (c *Context) AvcodecDecodeVideo2(f *avutil.Frame, g *int, a *Packet) int {
-	return int(C.avcodec_decode_video2((*C.struct_AVCodecContext)(c), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(g)), (*C.struct_AVPacket)(a)))
-}
-
 //Decode a subtitle message.
 func (c *Context) AvcodecDecodeSubtitle2(s *AvSubtitle, g *int, a *Packet) int {
 	return int(C.avcodec_decode_subtitle2((*C.struct_AVCodecContext)(c), (*C.struct_AVSubtitle)(s), (*C.int)(unsafe.Pointer(g)), (*C.struct_AVPacket)(a)))
-}
-
-//Encode a frame of audio.
-func (c *Context) AvcodecEncodeAudio2(p *Packet, f *avutil.Frame, gp *int) int {
-	return int(C.avcodec_encode_audio2((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(p), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(gp))))
-}
-
-//Encode a frame of video
-func (c *Context) AvcodecEncodeVideo2(p *Packet, f *avutil.Frame, gp *int) int {
-	return int(C.avcodec_encode_video2((*C.struct_AVCodecContext)(c), (*C.struct_AVPacket)(p), (*C.struct_AVFrame)(unsafe.Pointer(f)), (*C.int)(unsafe.Pointer(gp))))
 }
 
 func (c *Context) AvcodecEncodeSubtitle(b *uint8, bs int, s *AvSubtitle) int {
@@ -147,24 +83,12 @@ func (p *ParserContext) AvParserParse2(c *Context, packetData **uint8, packetSiz
 	return int(C.av_parser_parse2((*C.struct_AVCodecParserContext)(p), (*C.struct_AVCodecContext)(unsafe.Pointer(c)), (**C.uint8_t)(unsafe.Pointer(packetData)), (*C.int)(unsafe.Pointer(packetSize)), (*C.uint8_t)(unsafe.Pointer(sliceHeaderPoint)), C.int(dataSize), (C.int64_t)(pt), (C.int64_t)(dt), (C.int64_t)(po)))
 }
 
-func (c *Context) AvParserChange(ctxtp *ParserContext, pb **uint8, pbs *int, b *uint8, bs, k int) int {
-	return int(C.av_parser_change((*C.struct_AVCodecParserContext)(ctxtp), (*C.struct_AVCodecContext)(c), (**C.uint8_t)(unsafe.Pointer(pb)), (*C.int)(unsafe.Pointer(pbs)), (*C.uint8_t)(b), C.int(bs), C.int(k)))
-}
-
 func AvParserInit(c CodecId) *ParserContext {
 	return (*ParserContext)(C.av_parser_init(C.int(c)))
 }
 
 func (c *ParserContext) AvParserClose() {
 	C.av_parser_close((*C.struct_AVCodecParserContext)(c))
-}
-
-func (p *Parser) AvParserNext() *Parser {
-	return (*Parser)(C.av_parser_next((*C.struct_AVCodecParser)(p)))
-}
-
-func (p *Parser) AvRegisterCodecParser() {
-	C.av_register_codec_parser((*C.struct_AVCodecParser)(p))
 }
 
 func (c *Context) SetTimebase(num int, den int) {

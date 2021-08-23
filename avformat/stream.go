@@ -6,26 +6,7 @@ package avformat
 //#cgo pkg-config: libavformat
 //#include <libavformat/avformat.h>
 import "C"
-import (
-	"github.com/giorgisio/goav/avutil"
-)
 
-//Rational av_stream_get_r_frame_rate (const Stream *s)
-//func (s *Stream) AvStreamGetRFrameRate() avutil.Rational {
-//	return avutil.NewRational(C.av_stream_get_r_frame_rate((*C.struct_AVStream)(s)))
-//}
-
-//void av_stream_set_r_frame_rate (Stream *s, Rational r)
-func (s *Stream) AvStreamSetRFrameRate(r avutil.Rational) {
-	rat := C.struct_AVRational{
-		num: C.int(r.Num()),
-		den: C.int(r.Den()),
-	}
-
-	C.av_stream_set_r_frame_rate((*C.struct_AVStream)(s), rat)
-}
-
-//struct CodecParserContext * av_stream_get_parser (const Stream *s)
 func (s *Stream) AvStreamGetParser() *CodecParserContext {
 	return (*CodecParserContext)(C.av_stream_get_parser((*C.struct_AVStream)(s)))
 }
