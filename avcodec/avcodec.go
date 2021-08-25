@@ -16,7 +16,7 @@ package avcodec
 //#include <libavutil/avutil.h>
 import "C"
 import (
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avutil"
 	"reflect"
 	"unsafe"
 )
@@ -108,6 +108,10 @@ func (c *Codec) AvGetProfileName(p int) string {
 
 //Allocate an Context and set its fields to default values.
 func (c *Codec) AvcodecAllocContext3() *Context {
+	return (*Context)(C.avcodec_alloc_context3((*C.struct_AVCodec)(c)))
+}
+
+func AvcodecAllocContext3(c *Codec) *Context {
 	return (*Context)(C.avcodec_alloc_context3((*C.struct_AVCodec)(c)))
 }
 

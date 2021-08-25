@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/giorgisio/goav/avformat"
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avformat"
+	"github.com/HammerMax/goav/avutil"
 	"os"
 )
 

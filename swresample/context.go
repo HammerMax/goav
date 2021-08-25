@@ -9,7 +9,7 @@ package swresample
 */
 import "C"
 import (
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avutil"
 	"unsafe"
 )
 

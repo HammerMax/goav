@@ -7,7 +7,7 @@ package avcodec
 //#include <libavcodec/avcodec.h>
 import "C"
 import (
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avutil"
 	"unsafe"
 )
 

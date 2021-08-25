@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/giorgisio/goav/avcodec"
-	"github.com/giorgisio/goav/avformat"
-	"github.com/giorgisio/goav/avutil"
-	"github.com/giorgisio/goav/swresample"
-	"github.com/giorgisio/goav/swscale"
+	"github.com/HammerMax/goav/avcodec"
+	"github.com/HammerMax/goav/avformat"
+	"github.com/HammerMax/goav/avutil"
+	"github.com/HammerMax/goav/swresample"
+	"github.com/HammerMax/goav/swscale"
 	"math"
 	"os"
 )

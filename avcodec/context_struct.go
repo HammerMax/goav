@@ -3,7 +3,7 @@
 
 package avcodec
 
-import "github.com/giorgisio/goav/avutil"
+import "github.com/HammerMax/goav/avutil"
 
 func (c *Context) ActiveThreadType() int {
 	return int(c.active_thread_type)

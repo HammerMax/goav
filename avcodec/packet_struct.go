@@ -66,8 +66,13 @@ func (p *Packet) SetPts(pts int64) {
 	p.pts = C.int64_t(pts)
 }
 
-func (p *Packet) Data() *uint8 {
-	return (*uint8)(p.data)
+func (p *Packet) Data() []byte {
+	header := reflect.SliceHeader{
+		Data: uintptr(unsafe.Pointer(p.data)),
+		Len:  p.Size(),
+		Cap:  p.Size(),
+	}
+	return *(*[]byte)(unsafe.Pointer(&header))
 }
 
 func (p *Packet) DataPoint() **uint8 {

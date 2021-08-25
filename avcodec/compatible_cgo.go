@@ -3,7 +3,7 @@ package avcodec
 //#cgo pkg-config: libavutil
 //#include <libavutil/avutil.h>
 import "C"
-import "github.com/giorgisio/goav/avutil"
+import "github.com/HammerMax/goav/avutil"
 
 func avutilRational(rational C.struct_AVRational) avutil.Rational {
 	return avutil.NewRational(int(rational.num), int(rational.den))

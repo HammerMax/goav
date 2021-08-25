@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/giorgisio/goav/avutil"
-	"github.com/giorgisio/goav/swscale"
+	"github.com/HammerMax/goav/avutil"
+	"github.com/HammerMax/goav/swscale"
 	"os"
 )
 

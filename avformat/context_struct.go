@@ -7,67 +7,67 @@ package avformat
 //#include <libavformat/avformat.h>
 import "C"
 import (
-	"github.com/giorgisio/goav/avcodec"
+	"github.com/HammerMax/goav/avcodec"
 	"reflect"
 	"unsafe"
 
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avutil"
 )
 
-func (ctxt *Context) Chapters() **AvChapter {
-	return (**AvChapter)(unsafe.Pointer(ctxt.chapters))
+func (c *Context) Chapters() **AvChapter {
+	return (**AvChapter)(unsafe.Pointer(c.chapters))
 }
 
-func (ctxt *Context) AudioCodec() *avcodec.Codec {
-	return (*avcodec.Codec)(unsafe.Pointer(ctxt.audio_codec))
+func (c *Context) AudioCodec() *avcodec.Codec {
+	return (*avcodec.Codec)(unsafe.Pointer(c.audio_codec))
 }
 
-func (ctxt *Context) SubtitleCodec() *avcodec.Codec {
-	return (*avcodec.Codec)(unsafe.Pointer(ctxt.subtitle_codec))
+func (c *Context) SubtitleCodec() *avcodec.Codec {
+	return (*avcodec.Codec)(unsafe.Pointer(c.subtitle_codec))
 }
 
-func (ctxt *Context) VideoCodec() *avcodec.Codec {
-	return (*avcodec.Codec)(unsafe.Pointer(ctxt.video_codec))
+func (c *Context) VideoCodec() *avcodec.Codec {
+	return (*avcodec.Codec)(unsafe.Pointer(c.video_codec))
 }
 
-func (ctxt *Context) Metadata() *avutil.Dictionary {
-	return (*avutil.Dictionary)(unsafe.Pointer(ctxt.metadata))
+func (c *Context) Metadata() *avutil.Dictionary {
+	return (*avutil.Dictionary)(unsafe.Pointer(c.metadata))
 }
 
-func (ctxt *Context) Internal() *AvFormatInternal {
-	return (*AvFormatInternal)(unsafe.Pointer(ctxt.internal))
+func (c *Context) Internal() *AvFormatInternal {
+	return (*AvFormatInternal)(unsafe.Pointer(c.internal))
 }
 
-func (ctxt *Context) Pb() *AvIOContext {
-	return (*AvIOContext)(unsafe.Pointer(ctxt.pb))
+func (c *Context) Pb() *AvIOContext {
+	return (*AvIOContext)(unsafe.Pointer(c.pb))
 }
 
-func (ctxt *Context) InterruptCallback() AvIOInterruptCB {
-	return AvIOInterruptCB(ctxt.interrupt_callback)
+func (c *Context) InterruptCallback() AvIOInterruptCB {
+	return AvIOInterruptCB(c.interrupt_callback)
 }
 
-func (ctxt *Context) Programs() []*AvProgram {
+func (c *Context) Programs() []*AvProgram {
 	header := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(ctxt.programs)),
-		Len:  int(ctxt.NbPrograms()),
-		Cap:  int(ctxt.NbPrograms()),
+		Data: uintptr(unsafe.Pointer(c.programs)),
+		Len:  int(c.NbPrograms()),
+		Cap:  int(c.NbPrograms()),
 	}
 
 	return *((*[]*AvProgram)(unsafe.Pointer(&header)))
 }
 
-func (ctxt *Context) Streams() []*Stream {
+func (c *Context) Streams() []*Stream {
 	header := reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(ctxt.streams)),
-		Len:  int(ctxt.NbStreams()),
-		Cap:  int(ctxt.NbStreams()),
+		Data: uintptr(unsafe.Pointer(c.streams)),
+		Len:  int(c.NbStreams()),
+		Cap:  int(c.NbStreams()),
 	}
 
 	return *((*[]*Stream)(unsafe.Pointer(&header)))
 }
 
-func (ctxt *Context) Filename() string {
-	return C.GoString((*C.char)(unsafe.Pointer(&ctxt.filename[0])))
+func (c *Context) Filename() string {
+	return C.GoString((*C.char)(unsafe.Pointer(&c.filename[0])))
 }
 
 // func (ctxt *Context) CodecWhitelist() string {
@@ -78,198 +78,198 @@ func (ctxt *Context) Filename() string {
 // 	return C.GoString(ctxt.format_whitelist)
 // }
 
-func (ctxt *Context) AudioCodecId() avcodec.CodecId {
-	return avcodec.CodecId(ctxt.audio_codec_id)
+func (c *Context) AudioCodecId() avcodec.CodecId {
+	return avcodec.CodecId(c.audio_codec_id)
 }
 
-func (ctxt *Context) SubtitleCodecId() avcodec.CodecId {
-	return avcodec.CodecId(ctxt.subtitle_codec_id)
+func (c *Context) SubtitleCodecId() avcodec.CodecId {
+	return avcodec.CodecId(c.subtitle_codec_id)
 }
 
-func (ctxt *Context) VideoCodecId() avcodec.CodecId {
-	return avcodec.CodecId(ctxt.video_codec_id)
+func (c *Context) VideoCodecId() avcodec.CodecId {
+	return avcodec.CodecId(c.video_codec_id)
 }
 
-func (ctxt *Context) DurationEstimationMethod() AvDurationEstimationMethod {
-	return AvDurationEstimationMethod(ctxt.duration_estimation_method)
+func (c *Context) DurationEstimationMethod() AvDurationEstimationMethod {
+	return AvDurationEstimationMethod(c.duration_estimation_method)
 }
 
-func (ctxt *Context) AudioPreload() int {
-	return int(ctxt.audio_preload)
+func (c *Context) AudioPreload() int {
+	return int(c.audio_preload)
 }
 
-func (ctxt *Context) AvioFlags() int {
-	return int(ctxt.avio_flags)
+func (c *Context) AvioFlags() int {
+	return int(c.avio_flags)
 }
 
-func (ctxt *Context) AvoidNegativeTs() int {
-	return int(ctxt.avoid_negative_ts)
+func (c *Context) AvoidNegativeTs() int {
+	return int(c.avoid_negative_ts)
 }
 
-func (ctxt *Context) BitRate() int {
-	return int(ctxt.bit_rate)
+func (c *Context) BitRate() int {
+	return int(c.bit_rate)
 }
 
-func (ctxt *Context) CtxFlags() int {
-	return int(ctxt.ctx_flags)
+func (c *Context) CtxFlags() int {
+	return int(c.ctx_flags)
 }
 
-func (ctxt *Context) Debug() int {
-	return int(ctxt.debug)
+func (c *Context) Debug() int {
+	return int(c.debug)
 }
 
-func (ctxt *Context) ErrorRecognition() int {
-	return int(ctxt.error_recognition)
+func (c *Context) ErrorRecognition() int {
+	return int(c.error_recognition)
 }
 
-func (ctxt *Context) EventFlags() int {
-	return int(ctxt.event_flags)
+func (c *Context) EventFlags() int {
+	return int(c.event_flags)
 }
 
-func (ctxt *Context) Flags() int {
-	return int(ctxt.flags)
+func (c *Context) Flags() int {
+	return int(c.flags)
 }
 
-func (ctxt *Context) FlushPackets() int {
-	return int(ctxt.flush_packets)
+func (c *Context) FlushPackets() int {
+	return int(c.flush_packets)
 }
 
-func (ctxt *Context) FormatProbesize() int {
-	return int(ctxt.format_probesize)
+func (c *Context) FormatProbesize() int {
+	return int(c.format_probesize)
 }
 
-func (ctxt *Context) FpsProbeSize() int {
-	return int(ctxt.fps_probe_size)
+func (c *Context) FpsProbeSize() int {
+	return int(c.fps_probe_size)
 }
 
-func (ctxt *Context) IoRepositioned() int {
-	return int(ctxt.io_repositioned)
+func (c *Context) IoRepositioned() int {
+	return int(c.io_repositioned)
 }
 
-func (ctxt *Context) Keylen() int {
-	return int(ctxt.keylen)
+func (c *Context) Keylen() int {
+	return int(c.keylen)
 }
 
-func (ctxt *Context) MaxChunkDuration() int {
-	return int(ctxt.max_chunk_duration)
+func (c *Context) MaxChunkDuration() int {
+	return int(c.max_chunk_duration)
 }
 
-func (ctxt *Context) MaxChunkSize() int {
-	return int(ctxt.max_chunk_size)
+func (c *Context) MaxChunkSize() int {
+	return int(c.max_chunk_size)
 }
 
-func (ctxt *Context) MaxDelay() int {
-	return int(ctxt.max_delay)
+func (c *Context) MaxDelay() int {
+	return int(c.max_delay)
 }
 
-func (ctxt *Context) MaxTsProbe() int {
-	return int(ctxt.max_ts_probe)
+func (c *Context) MaxTsProbe() int {
+	return int(c.max_ts_probe)
 }
 
-func (ctxt *Context) MetadataHeaderPadding() int {
-	return int(ctxt.metadata_header_padding)
+func (c *Context) MetadataHeaderPadding() int {
+	return int(c.metadata_header_padding)
 }
 
-func (ctxt *Context) ProbeScore() int {
-	return int(ctxt.probe_score)
+func (c *Context) ProbeScore() int {
+	return int(c.probe_score)
 }
 
-func (ctxt *Context) Seek2any() int {
-	return int(ctxt.seek2any)
+func (c *Context) Seek2any() int {
+	return int(c.seek2any)
 }
 
-func (ctxt *Context) StrictStdCompliance() int {
-	return int(ctxt.strict_std_compliance)
+func (c *Context) StrictStdCompliance() int {
+	return int(c.strict_std_compliance)
 }
 
-func (ctxt *Context) TsId() int {
-	return int(ctxt.ts_id)
+func (c *Context) TsId() int {
+	return int(c.ts_id)
 }
 
-func (ctxt *Context) UseWallclockAsTimestamps() int {
-	return int(ctxt.use_wallclock_as_timestamps)
+func (c *Context) UseWallclockAsTimestamps() int {
+	return int(c.use_wallclock_as_timestamps)
 }
 
-func (ctxt *Context) Duration() int64 {
-	return int64(ctxt.duration)
+func (c *Context) Duration() int64 {
+	return int64(c.duration)
 }
 
-func (ctxt *Context) MaxAnalyzeDuration2() int64 {
-	return int64(ctxt.max_analyze_duration)
+func (c *Context) MaxAnalyzeDuration2() int64 {
+	return int64(c.max_analyze_duration)
 }
 
-func (ctxt *Context) MaxInterleaveDelta() int64 {
-	return int64(ctxt.max_interleave_delta)
+func (c *Context) MaxInterleaveDelta() int64 {
+	return int64(c.max_interleave_delta)
 }
 
-func (ctxt *Context) OutputTsOffset() int64 {
-	return int64(ctxt.output_ts_offset)
+func (c *Context) OutputTsOffset() int64 {
+	return int64(c.output_ts_offset)
 }
 
-func (ctxt *Context) Probesize2() int64 {
-	return int64(ctxt.probesize)
+func (c *Context) Probesize2() int64 {
+	return int64(c.probesize)
 }
 
-func (ctxt *Context) SkipInitialBytes() int64 {
-	return int64(ctxt.skip_initial_bytes)
+func (c *Context) SkipInitialBytes() int64 {
+	return int64(c.skip_initial_bytes)
 }
 
-func (ctxt *Context) StartTime() int64 {
-	return int64(ctxt.start_time)
+func (c *Context) StartTime() int64 {
+	return int64(c.start_time)
 }
 
-func (ctxt *Context) StartTimeRealtime() int64 {
-	return int64(ctxt.start_time_realtime)
+func (c *Context) StartTimeRealtime() int64 {
+	return int64(c.start_time_realtime)
 }
 
-func (ctxt *Context) Iformat() *InputFormat {
-	return (*InputFormat)(unsafe.Pointer(ctxt.iformat))
+func (c *Context) Iformat() *InputFormat {
+	return (*InputFormat)(unsafe.Pointer(c.iformat))
 }
 
-func (ctxt *Context) Oformat() *OutputFormat {
-	return (*OutputFormat)(unsafe.Pointer(ctxt.oformat))
+func (c *Context) Oformat() *OutputFormat {
+	return (*OutputFormat)(unsafe.Pointer(c.oformat))
 }
 
 // func (ctxt *Context) DumpSeparator() uint8 {
 // 	return uint8(ctxt.dump_separator)
 // }
 
-func (ctxt *Context) CorrectTsOverflow() int {
-	return int(ctxt.correct_ts_overflow)
+func (c *Context) CorrectTsOverflow() int {
+	return int(c.correct_ts_overflow)
 }
 
-func (ctxt *Context) MaxIndexSize() uint {
-	return uint(ctxt.max_index_size)
+func (c *Context) MaxIndexSize() uint {
+	return uint(c.max_index_size)
 }
 
-func (ctxt *Context) MaxPictureBuffer() uint {
-	return uint(ctxt.max_picture_buffer)
+func (c *Context) MaxPictureBuffer() uint {
+	return uint(c.max_picture_buffer)
 }
 
-func (ctxt *Context) NbChapters() uint {
-	return uint(ctxt.nb_chapters)
+func (c *Context) NbChapters() uint {
+	return uint(c.nb_chapters)
 }
 
-func (ctxt *Context) NbPrograms() uint {
-	return uint(ctxt.nb_programs)
+func (c *Context) NbPrograms() uint {
+	return uint(c.nb_programs)
 }
 
-func (ctxt *Context) NbStreams() uint {
-	return uint(ctxt.nb_streams)
+func (c *Context) NbStreams() uint {
+	return uint(c.nb_streams)
 }
 
-func (ctxt *Context) PacketSize() uint {
-	return uint(ctxt.packet_size)
+func (c *Context) PacketSize() uint {
+	return uint(c.packet_size)
 }
 
-func (ctxt *Context) Probesize() uint {
-	return uint(ctxt.probesize)
+func (c *Context) Probesize() uint {
+	return uint(c.probesize)
 }
 
-func (ctxt *Context) SetPb(pb *AvIOContext) {
-	ctxt.pb = (*C.struct_AVIOContext)(unsafe.Pointer(pb))
+func (c *Context) SetPb(pb *AvIOContext) {
+	c.pb = (*C.struct_AVIOContext)(unsafe.Pointer(pb))
 }
 
-func (ctxt *Context) Pb2() **AvIOContext {
-	return (**AvIOContext)(unsafe.Pointer(&ctxt.pb))
+func (c *Context) Pb2() **AvIOContext {
+	return (**AvIOContext)(unsafe.Pointer(&c.pb))
 }

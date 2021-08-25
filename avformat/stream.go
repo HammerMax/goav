@@ -8,8 +8,8 @@ package avformat
 import "C"
 import (
 	"fmt"
-	"github.com/giorgisio/goav/avcodec"
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avcodec"
+	"github.com/HammerMax/goav/avutil"
 )
 
 func (s *Stream) AvStreamGetParser() *CodecParserContext {

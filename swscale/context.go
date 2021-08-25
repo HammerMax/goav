@@ -7,8 +7,8 @@ package swscale
 //#include <libswscale/swscale.h>
 import "C"
 import (
-	"github.com/giorgisio/goav/avfilter"
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avfilter"
+	"github.com/HammerMax/goav/avutil"
 	"reflect"
 	"unsafe"
 )

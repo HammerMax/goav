@@ -8,7 +8,7 @@ package avcodec
 //#include <libavutil/opt.h>
 import "C"
 import (
-	"github.com/giorgisio/goav/avutil"
+	"github.com/HammerMax/goav/avutil"
 	"reflect"
 	"unsafe"
 )
@@ -60,6 +60,10 @@ func (c *Context) AvcodecEncodeSubtitle(b *uint8, bs int, s *AvSubtitle) int {
 
 func (c *Context) AvcodecDefaultGetFormat(f *PixelFormat) PixelFormat {
 	return (PixelFormat)(C.avcodec_default_get_format((*C.struct_AVCodecContext)(c), (*C.enum_AVPixelFormat)(f)))
+}
+
+func (c *Context) AvcodecParametersToContext(parameter *AvCodecParameters) error {
+	return avutil.ErrorFromCode(int(C.avcodec_parameters_to_context((*C.struct_AVCodecContext)(c), (*C.struct_AVCodecParameters)(parameter))))
 }
 
 //Reset the internal decoder state / flush internal buffers.
