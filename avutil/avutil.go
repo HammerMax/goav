@@ -41,6 +41,10 @@ const (
 	AV_ROUND_PASS_MINMAX = AVRounding(8192)
 )
 
+const (
+	AV_TIME_BASE = C.AV_TIME_BASE
+)
+
 func (r Rational) Num() int {
 	return int(r.num)
 }

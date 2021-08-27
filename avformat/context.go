@@ -66,8 +66,8 @@ func (c *Context) AvReadFrame(pkt *avcodec.Packet) error {
 }
 
 //Seek to the keyframe at timestamp.
-func (c *Context) AvSeekFrame(st int, t int64, f int) int {
-	return int(C.av_seek_frame((*C.struct_AVFormatContext)(c), C.int(st), C.int64_t(t), C.int(f)))
+func (c *Context) AvSeekFrame(st int, t int64, f int) error {
+	return avutil.ErrorFromCode(int(C.av_seek_frame((*C.struct_AVFormatContext)(c), C.int(st), C.int64_t(t), C.int(f))))
 }
 
 // AvSeekFrameTime seeks to a specified time location.
