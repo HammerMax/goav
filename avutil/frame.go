@@ -88,6 +88,10 @@ func (f *Frame) AvFrameGetBuffer(align int32) error {
 	return ErrorFromCode(int(C.av_frame_get_buffer((*C.struct_AVFrame)(unsafe.Pointer(f)), C.int(align))))
 }
 
+func (f *Frame) AvFrameUnref() {
+	C.av_frame_unref((*C.struct_AVFrame)(f))
+}
+
 func (f *Frame) Data() [][]byte {
 	var data = make([][]byte, int(C.AV_NUM_DATA_POINTERS))
 	for i:=int32(0);i<int32(C.AV_NUM_DATA_POINTERS);i++ {

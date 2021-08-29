@@ -9,6 +9,7 @@ package avfilter
 */
 import "C"
 import (
+	"github.com/HammerMax/goav/avutil"
 	"unsafe"
 )
 
@@ -33,8 +34,8 @@ func (g *Graph) AvfilterGraphSetAutoConvert(f uint) {
 }
 
 //Check validity and configure all the links and formats in the graph.
-func (g *Graph) AvfilterGraphConfig(l int) int {
-	return int(C.avfilter_graph_config((*C.struct_AVFilterGraph)(g), unsafe.Pointer(&l)))
+func (g *Graph) AvfilterGraphConfig(l interface{}) error {
+	return avutil.ErrorFromCode(int(C.avfilter_graph_config((*C.struct_AVFilterGraph)(g), unsafe.Pointer(&l))))
 }
 
 //Free a graph, destroy its links, and set *graph to NULL.
@@ -43,17 +44,17 @@ func (g *Graph) AvfilterGraphFree() {
 }
 
 //Add a graph described by a string to a graph.
-func (g *Graph) AvfilterGraphParse(f string, i, o *Input, l int) int {
+func (g *Graph) AvfilterGraphParse(f string, i, o *Inout, l int) int {
 	return int(C.avfilter_graph_parse((*C.struct_AVFilterGraph)(g), C.CString(f), (*C.struct_AVFilterInOut)(i), (*C.struct_AVFilterInOut)(o), unsafe.Pointer(&l)))
 }
 
 //Add a graph described by a string to a graph.
-func (g *Graph) AvfilterGraphParsePtr(f string, i, o **Input, l int) int {
-	return int(C.avfilter_graph_parse_ptr((*C.struct_AVFilterGraph)(g), C.CString(f), (**C.struct_AVFilterInOut)(unsafe.Pointer(i)), (**C.struct_AVFilterInOut)(unsafe.Pointer(o)), unsafe.Pointer(&l)))
+func (g *Graph) AvfilterGraphParsePtr(filters string, input, output **Inout, log interface{}) error {
+	return avutil.ErrorFromCode(int(C.avfilter_graph_parse_ptr((*C.struct_AVFilterGraph)(g), C.CString(filters), (**C.struct_AVFilterInOut)(unsafe.Pointer(input)), (**C.struct_AVFilterInOut)(unsafe.Pointer(output)), nil)))
 }
 
 //Add a graph described by a string to a graph.
-func (g *Graph) AvfilterGraphParse2(f string, i, o **Input) int {
+func (g *Graph) AvfilterGraphParse2(f string, i, o **Inout) int {
 	return int(C.avfilter_graph_parse2((*C.struct_AVFilterGraph)(g), C.CString(f), (**C.struct_AVFilterInOut)(unsafe.Pointer(i)), (**C.struct_AVFilterInOut)(unsafe.Pointer(o))))
 }
 
@@ -78,6 +79,6 @@ func (g *Graph) AvfilterGraphRequestOldestlink() int {
 }
 
 //Create and add a filter instance into an existing graph.
-func AvfilterGraphCreateFilter(cx **Context, f *Filter, n, a string, o int, g *Graph) int {
-	return int(C.avfilter_graph_create_filter((**C.struct_AVFilterContext)(unsafe.Pointer(cx)), (*C.struct_AVFilter)(f), C.CString(n), C.CString(a), unsafe.Pointer(&o), (*C.struct_AVFilterGraph)(g)))
+func AvfilterGraphCreateFilter(context **Context, filter *Filter, name, args string, opaque int, graph *Graph) error {
+	return avutil.ErrorFromCode(int(C.avfilter_graph_create_filter((**C.struct_AVFilterContext)(unsafe.Pointer(context)), (*C.struct_AVFilter)(filter), C.CString(name), C.CString(args), unsafe.Pointer(&opaque), (*C.struct_AVFilterGraph)(graph))))
 }

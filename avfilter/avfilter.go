@@ -20,7 +20,7 @@ type (
 	Context    C.struct_AVFilterContext
 	Link       C.struct_AVFilterLink
 	Graph      C.struct_AVFilterGraph
-	Input      C.struct_AVFilterInOut
+	Inout      C.struct_AVFilterInOut
 	Pad        C.struct_AVFilterPad
 	Dictionary C.struct_AVDictionary
 	Class      C.struct_AVClass
@@ -67,16 +67,6 @@ func AvfilterLinkFree(l **Link) {
 	C.avfilter_link_free((**C.struct_AVFilterLink)(unsafe.Pointer(l)))
 }
 
-//Get the number of channels of a link.
-func AvfilterLinkGetChannels(l *Link) int {
-	return int(C.avfilter_link_get_channels((*C.struct_AVFilterLink)(l)))
-}
-
-//Set the closed field of a link.
-func AvfilterLinkSetClosed(l *Link, c int) {
-	C.avfilter_link_set_closed((*C.struct_AVFilterLink)(l), C.int(c))
-}
-
 //Negotiate the media format, dimensions, etc of all inputs to a filter.
 func AvfilterConfigLinks(f *Context) int {
 	return int(C.avfilter_config_links((*C.struct_AVFilterContext)(f)))
@@ -85,11 +75,6 @@ func AvfilterConfigLinks(f *Context) int {
 //Make the filter instance process a command.
 func AvfilterProcessCommand(f *Context, cmd, arg, res string, l, fl int) int {
 	return int(C.avfilter_process_command((*C.struct_AVFilterContext)(f), C.CString(cmd), C.CString(arg), C.CString(res), C.int(l), C.int(fl)))
-}
-
-//Initialize the filter system.
-func AvfilterRegisterAll() {
-	C.avfilter_register_all()
 }
 
 //Initialize a filter with the supplied parameters.
@@ -118,11 +103,27 @@ func AvfilterGetClass() *Class {
 }
 
 //Allocate a single Input entry.
-func AvfilterInoutAlloc() *Input {
-	return (*Input)(C.avfilter_inout_alloc())
+func AvfilterInoutAlloc() *Inout {
+	return (*Inout)(C.avfilter_inout_alloc())
 }
 
 //Free the supplied list of Input and set *inout to NULL.
-func AvfilterInoutFree(i *Input) {
+func AvfilterInoutFree(i *Inout) {
 	C.avfilter_inout_free((**C.struct_AVFilterInOut)(unsafe.Pointer(i)))
+}
+
+func (i *Inout) SetName(name string) {
+	cname := C.CString(name)
+	//defer C.free(unsafe.Pointer(cname))
+	// 不能free这个字段，因为它是结构体的一部分
+
+	i.name = cname
+}
+
+func (i *Inout) SetFilterCtx(ctx *Context) {
+	i.filter_ctx = (*C.struct_AVFilterContext)(ctx)
+}
+
+func (i *Inout) SetPadIdx(padIdx int) {
+	i.pad_idx = C.int(padIdx)
 }

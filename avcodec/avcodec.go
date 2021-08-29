@@ -281,3 +281,7 @@ func (c *Codec) SupportedSamplerates() []int32 {
 func (cp *AvCodecParameters) AvCodecParametersFromContext(codec *Context) error {
 	return avutil.ErrorFromCode(int(C.avcodec_parameters_from_context((*C.struct_AVCodecParameters)(cp), (*C.struct_AVCodecContext)(codec))))
 }
+
+func (c *Context) SampleAspectRatio() avutil.Rational {
+	return *(*avutil.Rational)(unsafe.Pointer(&c.sample_aspect_ratio))
+}
